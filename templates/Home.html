@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuidARP ENFERMERÍA - Hospital Dr. Carlos Pereyra</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            900: '#071D17',
+                            800: '#0B2B22', // Sidebar principal
+                            700: '#123D31', // Hover sidebar
+                            600: '#1D4F41', // Estado activo
+                            500: '#2A6B58',
+                            100: '#E6F2ED',
+                            50: '#F0F7F4',
+                        },
+                        badge: {
+                            green: '#22C55E',
+                            mint: '#DCFCE7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F5F4;
+        }
+        /* Style custom checkboxes */
+        .custom-checkbox {
+            width: 17px;
+            height: 17px;
+            accent-color: #0B2B22;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased h-screen flex overflow-hidden">
+
+    <!-- ================= SIDEBAR LATERAL ================= -->
+    <aside class="w-64 bg-forest-800 text-white flex flex-col justify-between flex-shrink-0 select-none">
+        <div>
+            <!-- Header App Logo -->
+            <div class="p-6 flex items-center space-x-3">
+                <div class="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-inner">
+                    <i class="fa-solid fa-plus text-white text-base"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-wide text-white">CuidARP</h1>
+                    <p class="text-[10px] text-emerald-200/70 font-medium tracking-widest uppercase">ENFERMERÍA</p>
+                </div>
+            </div>
+
+            <!-- Navegación -->
+            <nav class="mt-2 px-3 space-y-6">
+                <div>
+                    <span class="px-3 text-[11px] font-semibold text-gray-400 tracking-wider uppercase">GESTIÓN</span>
+                    <div class="mt-3 space-y-1">
+                        
+                        <!-- Inicio -->
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:bg-forest-700 hover:text-white transition-colors">
+                            <i class="fa-solid fa-house w-5 text-center text-sm opacity-80"></i>
+                            <span class="font-medium">Inicio</span>
+                        </a>
+
+                        <!-- Pacientes -->
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:bg-forest-700 hover:text-white transition-colors">
+                            <i class="fa-solid fa-user-group w-5 text-center text-sm opacity-80"></i>
+                            <span class="font-medium">Pacientes</span>
+                        </a>
+
+                        <!-- Sectores y camas -->
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:bg-forest-700 hover:text-white transition-colors">
+                            <i class="fa-solid fa-border-all w-5 text-center text-sm opacity-80"></i>
+                            <span class="font-medium">Sectores y camas</span>
+                        </a>
+
+                        <!-- Planillas (Active State) -->
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-white bg-forest-600 font-semibold shadow-sm">
+                            <i class="fa-solid fa-table-list w-5 text-center text-sm"></i>
+                            <span>Planillas</span>
+                        </a>
+
+                        <!-- Enfermeros -->
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:bg-forest-700 hover:text-white transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-user-doctor w-5 text-center text-sm opacity-80"></i>
+                                <span class="font-medium">Enfermeros</span>
+                            </div>
+                            <span class="bg-rose-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">3</span>
+                        </a>
+
+                        <!-- Exportar reportes -->
+                        <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm text-gray-300 hover:bg-forest-700 hover:text-white transition-colors">
+                            <i class="fa-solid fa-file-export w-5 text-center text-sm opacity-80"></i>
+                            <span class="font-medium">Exportar reportes</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Footer Sidebar (Configuración & Perfil) -->
+        <div class="p-4 space-y-4">
+            <a href="#" class="flex items-center space-x-3 px-3 py-2 text-sm text-gray-300 hover:text-white transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center text-sm opacity-80"></i>
+                <span class="font-medium">Configuración</span>
+            </a>
+
+            <!-- User Info Card -->
+            <div class="pt-3 border-t border-forest-700 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-800 text-emerald-200 border border-emerald-600 flex items-center justify-center font-bold text-xs">
+                        JS
+                    </div>
+                    <div class="text-xs">
+                        <p class="font-semibold text-white leading-tight">Julia Suárez</p>
+                        <p class="text-gray-400 text-[11px]">Jefa de Enfermería</p>
+                    </div>
+                </div>
+                <button title="Cerrar sesión" class="text-gray-400 hover:text-white p-1 transition-colors">
+                    <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- Top Navigation Header -->
+        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+            <!-- Buscador -->
+            <div class="relative w-full max-w-lg">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </span>
+                <input type="text" 
+                       placeholder="Buscar por paciente, DNI o historia clínica..." 
+                       class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
+                </div>
+            </div>
+
+            <!-- Derecha: Notificaciones e Info del Hospital -->
+            <div class="flex items-center space-x-6">
+                <!-- Icono de Notificación con Punto Rojo -->
+                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                </button>
+
+                <!-- Info Hospital / Fecha -->
+                <div class="text-right border-l border-gray-200 pl-6">
+                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</p>
+                    <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Área de Contenido Scrollable -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+
+                <!-- PANEL IZQUIERDO: Planilla de administración individual -->
+                <div class="flex-1 bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <!-- Header de la Planilla -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-900">Planilla de administración individual</h2>
+                                <p class="text-xs text-gray-400 font-medium mt-0.5">Registro de medicación del paciente</p>
+                            </div>
+                            <!-- Badge En Tiempo Real -->
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span>
+                                EN TIEMPO REAL
+                            </span>
+                        </div>
+
+                        <!-- Card Informativo del Paciente -->
+                        <div class="bg-gray-50/80 border border-gray-100 rounded-xl p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <!-- Avatar & Paciente -->
+                            <div class="flex items-center space-x-3">
+                                <div class="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                    AL
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">PACIENTE</p>
+                                    <p class="text-sm font-bold text-gray-900">Ana López</p>
+                                    <p class="text-xs text-gray-500">DNI 32.458.721</p>
+                                </div>
+                            </div>
+
+                            <!-- Sector -->
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">SECTOR</p>
+                                <p class="text-sm font-bold text-gray-800 mt-1">Sala Norte</p>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">UBICACIÓN</p>
+                                <p class="text-sm font-bold text-gray-800 mt-1">Habitación 204 · Cama A</p>
+                            </div>
+
+                            <!-- Diagnóstico -->
+                            <div>
+                                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">DIAGNÓSTICO DE SALUD MENTAL (CIE-10)</p>
+                                <p class="text-sm font-bold text-gray-800 mt-1">F20.0 · Esquizofrenia paranoide</p>
+                            </div>
+                        </div>
+
+                        <!-- TABLA DE REGISTROS -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                                        <th class="py-3 px-2">FECHA</th>
+                                        <th class="py-3 px-2">Nº RECETA</th>
+                                        <th class="py-3 px-2">HORARIOS DE ADMINISTRACIÓN</th>
+                                        <th class="py-3 px-2">OBSERVACIONES</th>
+                                        <th class="py-3 px-2">SELLO DEL ENFERMERO/A</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-xs">
+                                    
+                                    <!-- FILA 1: 14/08/2025 -->
+                                    <tr>
+                                        <td class="py-4 px-2 font-bold text-gray-800">14/08/2025</td>
+                                        <td class="py-4 px-2">
+                                            <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg text-xs font-semibold border border-emerald-200">
+                                                <i class="fa-regular fa-clipboard text-emerald-600"></i>
+                                                <span>REC-0238</span>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Desayuno</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-400 cursor-pointer">
+                                                    <input type="checkbox" class="custom-checkbox">
+                                                    <span>Almuerzo</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-400 cursor-pointer">
+                                                    <input type="checkbox" class="custom-checkbox">
+                                                    <span>Merienda</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Cena</span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-gray-500 text-[11px] min-h-[48px] flex items-center">
+                                                Sin eventos adversos.
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="flex items-center space-x-2.5">
+                                                <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+                                                    <i class="fa-solid fa-pen text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-gray-800 text-xs">Lic. Sofía Medina</p>
+                                                    <p class="text-[10px] text-gray-400">Matrícula SM-2841</p>
+                                                    <p class="text-[9px] text-emerald-600 font-medium">Firmado digitalmente</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- FILA 2: 13/08/2025 -->
+                                    <tr>
+                                        <td class="py-4 px-2 font-bold text-gray-800">13/08/2025</td>
+                                        <td class="py-4 px-2">
+                                            <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg text-xs font-semibold border border-emerald-200">
+                                                <i class="fa-regular fa-clipboard text-emerald-600"></i>
+                                                <span>REC-0238</span>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Desayuno</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Almuerzo</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Merienda</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Cena</span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-gray-500 text-[11px] min-h-[48px] flex items-center">
+                                                Paciente colaboradora.
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="flex items-center space-x-2.5">
+                                                <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+                                                    <i class="fa-solid fa-pen text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-gray-800 text-xs">Lic. Tomás Silva</p>
+                                                    <p class="text-[10px] text-gray-400">Matrícula TS-1954</p>
+                                                    <p class="text-[9px] text-emerald-600 font-medium">Firmado digitalmente</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <!-- FILA 3: 12/08/2025 -->
+                                    <tr>
+                                        <td class="py-4 px-2 font-bold text-gray-800">12/08/2025</td>
+                                        <td class="py-4 px-2">
+                                            <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg text-xs font-semibold border border-emerald-200">
+                                                <i class="fa-regular fa-clipboard text-emerald-600"></i>
+                                                <span>REC-0215</span>
+                                            </span>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Desayuno</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-400 cursor-pointer">
+                                                    <input type="checkbox" class="custom-checkbox">
+                                                    <span>Almuerzo</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-400 cursor-pointer">
+                                                    <input type="checkbox" class="custom-checkbox">
+                                                    <span>Merienda</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 text-gray-700 cursor-pointer">
+                                                    <input type="checkbox" checked class="custom-checkbox">
+                                                    <span class="font-medium">Cena</span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-gray-500 text-[11px] min-h-[48px] flex items-center">
+                                                Rechaza dosis del mediodía.
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2">
+                                            <div class="flex items-center space-x-2.5">
+                                                <div class="w-7 h-7 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+                                                    <i class="fa-solid fa-pen text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-bold text-gray-800 text-xs">Lic. Sofía Medina</p>
+                                                    <p class="text-[10px] text-gray-400">Matrícula SM-2841</p>
+                                                    <p class="text-[9px] text-emerald-600 font-medium">Firmado digitalmente</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Botón de añadir (+ al pie de la tabla) -->
+                    <div class="flex justify-center mt-6 pt-4 border-t border-gray-100">
+                        <button title="Agregar nuevo registro" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-forest-800 hover:text-white hover:border-forest-800 transition-all shadow-2xs">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PANEL DERECHO: Pacientes recientes -->
+                <div class="w-full lg:w-72 bg-white rounded-2xl p-6 border border-gray-100 shadow-xs flex flex-col justify-between h-fit">
+                    <div>
+                        <!-- Header Sección -->
+                        <h3 class="text-base font-bold text-gray-900">Pacientes recientes</h3>
+                        <p class="text-xs text-gray-400 font-medium mb-4">Accesos rápidos</p>
+
+                        <!-- Lista de Pacientes -->
+                        <div class="space-y-4">
+
+                            <!-- Paciente 1 -->
+                            <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
+                                <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                    AL
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs font-bold text-gray-800 truncate">Ana López</p>
+                                    <p class="text-[10px] text-gray-400 truncate">HC-004582 · Hab. 204 · Cama A</p>
+                                </div>
+                            </div>
+
+                            <!-- Paciente 2 -->
+                            <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
+                                <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                    CM
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs font-bold text-gray-800 truncate">Carlos Méndez</p>
+                                    <p class="text-[10px] text-gray-400 truncate">HC-004619 · Hab. 207 · Cama B</p>
+                                </div>
+                            </div>
+
+                            <!-- Paciente 3 -->
+                            <div class="flex items-center space-x-3 pb-3 border-b border-gray-100">
+                                <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                    MR
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs font-bold text-gray-800 truncate">Marta Ríos</p>
+                                    <p class="text-[10px] text-gray-400 truncate">HC-004621 · Hab. 211 · Cama A</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Enlace Ver todos -->
+                    <div class="mt-6 pt-2">
+                        <a href="#" class="inline-flex items-center text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors">
+                            <span>Ver todos los pacientes</span>
+                            <i class="fa-solid fa-chevron-right text-[10px] ml-1.5"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
