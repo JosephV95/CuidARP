@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuidARP ENFERMERÍA - Registro de Nuevo Usuario</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            900: '#071D17',
+                            800: '#0B2B22',
+                            700: '#123D31',
+                            600: '#1D4F41',
+                            500: '#2A6B58',
+                            100: '#E6F2ED',
+                            50: '#F0F7F4',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F5F4;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden my-8">
+        
+        <!-- Header del Formulario -->
+        <div class="bg-cyan-950 text-white p-6 text-center relative">
+            <div class="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-3 shadow-inner">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <h1 class="font-bold text-xl tracking-wide">CuidARP ENFERMERÍA</h1>
+            <p class="text-xs text-emerald-200/80 uppercase tracking-widest mt-1">Registro de Nuevo Profesional</p>
+        </div>
+
+        <!-- Formulario (Preparado para Django con method="POST") -->
+        <form action="" method="POST" class="p-8 space-y-5">
+            <!-- {% csrf_token %} <-- Descomentar esta etiqueta cuando uses plantillas de Django -->
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Nombre -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
+                    <input type="text" name="nombre" required placeholder="Ej: Sofía" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+
+                <!-- Apellido -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
+                    <input type="text" name="apellido" required placeholder="Ej: Medina" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+
+                <!-- DNI -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
+                    <input type="text" name="dni" required placeholder="Ej: 34892102" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Matrícula Profesional -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nº de Matrícula (SISA) *</label>
+                    <input type="text" name="matricula" required placeholder="Ej: SM-2841" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono de Contacto *</label>
+                    <input type="tel" name="telefono" required placeholder="Ej: +54 261 459-2011" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Correo Electrónico -->
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Institucional / Personal) *</label>
+                <input type="email" name="email" required placeholder="Ej: s.medina@hospitalpereyra.gob.ar" 
+                       class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Tipo de Profesional -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Tipo de Profesional *</label>
+                    <select name="tipo_profesional" class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="Licenciado">Licenciado/a en Enfermería</option>
+                        <option value="Enfermero Profesional">Enfermero/a Profesional</option>
+                    </select>
+                </div>
+
+                <!-- Servicio del Hospital -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Servicio del Hospital *</label>
+                    <select name="servicio" class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="Sector Varones">Sector Varones</option>
+                        <option value="Sector Mujeres">Sector Mujeres</option>
+                        <option value="Guardia / Admisión">Guardia / Admisión</option>
+                        <option value="Internación General">Internación General</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Rol en la plataforma -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Rol Solicitado en la Plataforma *</label>
+                    <select name="rol" class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="enfermero">Enfermero/a</option>
+                        <option value="jefe">Jefe/a de Enfermeros</option>
+                    </select>
+                </div>
+
+                <!-- Clave PIN Numérico para sello -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">PIN Numérico (Para Sello Digital) *</label>
+                    <input type="password" name="pin_sello" maxlength="6" required placeholder="Ej: 1234 (4 dígitos)" 
+                           class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+            </div>
+
+            <!-- Contraseña -->
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Contraseña de Inicio de Sesión *</label>
+                <input type="password" name="password" required placeholder="••••••••" 
+                       class="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+            </div>
+
+            <!-- Botón de Registro -->
+            <div class="pt-2">
+                <button type="submit" class="w-full py-3 bg-cyan-900 hover:bg-cyan-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>Completar Registro y Solicitar Acceso</span>
+                </button>
+            </div>
+
+            <!-- Enlace para volver al login -->
+            <div class="text-center pt-2">
+                <p class="text-xs text-gray-500">¿Ya tienes una cuenta registrada? 
+                    <a href="{% url 'login_usuario' %}" class="font-bold text-teal-700 hover:underline">Iniciar Sesión</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

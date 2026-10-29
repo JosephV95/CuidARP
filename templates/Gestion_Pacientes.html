@@ -1,0 +1,872 @@
+{% extends 'layouts/sidebarBase.html' %}
+
+{% block contenido %}
+
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- Top Navigation Header -->
+        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+            <!-- Buscador general de pacientes -->
+            <div class="relative w-full max-w-lg">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </span>
+                <input type="text" id="search-patient" onkeyup="filterPacientes()"
+                       placeholder="Buscar paciente por nombre, DNI, cama o sector..." 
+                       class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
+                </div>
+            </div>
+
+            <!-- Derecha: Notificaciones e Info del Hospital -->
+            <div class="flex items-center space-x-6">
+                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
+                </button>
+
+                <div class="text-right border-l border-gray-200 pl-6">
+                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra - Internación Psiquiátrica</p>
+                    <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Área de Contenido Scrollable -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-7xl mx-auto space-y-6">
+
+                <!-- HEADER SECCIÓN Y METRICAS DE PACIENTES INTERNADOS -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-2xl font-bold text-gray-900">Nómina de Pacientes Internados</h2>
+                            <span class="bg-forest-100 text-forest-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-forest-500/20">
+                                Monitoreo Psiquiátrico Continuo
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Administración de recetas, esquemas de medicación y control de enfermería por sector.</p>
+                    </div>
+
+                    <!-- Botones de Acción Global -->
+                    <div class="flex items-center space-x-3">
+                        <button onclick="showToast('Módulo de admisión de nuevo paciente abierto.')" class="bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                            <i class="fa-solid fa-user-plus text-xs"></i>
+                            <span>Admitir Nuevo Paciente</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR PRINCIPAL: GRILLA LISTADO + PERFIL DERECHA -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- COLUMNA IZQUIERDA (2 COLS): LISTADO DE PACIENTES -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
+                            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                                <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
+                                    <i class="fa-solid fa-bed text-forest-800"></i>
+                                    <span>Pacientes en Unidad de Internación</span>
+                                </h3>
+                                <div class="flex items-center space-x-2 text-xs">
+                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-semibold rounded-md border border-emerald-200">Sector Varones</span>
+                                    <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-semibold rounded-md border border-purple-200">Sector Mujeres</span>
+                                </div>
+                            </div>
+
+                            <!-- CONTENEDOR TARJETAS PACIENTES -->
+                            <div id="pacientes-container" class="mt-4 space-y-3">
+                                <!-- Se renderiza vía JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA DERECHA (1 COL): PERFIL COMPLETO Y RECETAS DEL PACIENTE -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                            <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider flex items-center space-x-2">
+                                    <i class="fa-solid fa-hospital-user text-forest-800"></i>
+                                    <span>Ficha Clínica & Recetario</span>
+                                </h3>
+                                <span class="text-[10px] bg-forest-50 text-forest-800 font-semibold px-2 py-0.5 rounded-full border border-forest-200">En vista</span>
+                            </div>
+
+                            <!-- CONTENIDO DINÁMICO DEL PERFIL Y RECETA -->
+                            <div id="patient-preview-panel">
+                                <!-- Se renderiza por JS al seleccionar un paciente -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= MODAL 1: AGREGAR NUEVA RECETA / INDICACIÓN MÉDICA ================= -->
+    <div id="modal-receta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+            
+            <!-- Header Modal Receta -->
+            <div class="bg-forest-800 text-white p-5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-300 border border-white/20">
+                        <i class="fa-solid fa-file-prescription text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-base leading-tight">Prescribir Indicación Médica Psiquiátrica</h4>
+                        <p class="text-xs text-emerald-200/80">CuidARP - Registro de Esquema Farmacológico Internación</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-receta')" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo Modal Scrollable -->
+            <div class="p-6 overflow-y-auto space-y-5">
+                <!-- Info Paciente Contextual -->
+                <div class="bg-forest-50 border border-forest-200/80 rounded-xl p-3.5 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] text-forest-700 font-semibold uppercase tracking-wider">Paciente Destino</span>
+                        <h5 id="receta-modal-paciente" class="font-bold text-forest-900 text-sm">--</h5>
+                    </div>
+                    <div class="text-right text-xs">
+                        <span id="receta-modal-cama" class="font-mono bg-white px-2 py-1 rounded border border-forest-200 text-forest-800 font-bold">--</span>
+                    </div>
+                </div>
+
+                <!-- Datos de la Prescripción -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Médico Psiquiatra Prescriptor *</label>
+                        <select id="receta-medico" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none font-medium">
+                            <option value="Dr. Roberto Arlt (MP 8412)">Dr. Roberto Arlt (MP 8412)</option>
+                            <option value="Dra. Ana María Gómez (MP 9120)">Dra. Ana María Gómez (MP 9120)</option>
+                            <option value="Dr. Carlos Fontanarrosa (MP 6540)">Dr. Carlos Fontanarrosa (MP 6540)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Prescripción *</label>
+                        <input type="date" id="receta-fecha" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- LISTA DINÁMICA DE FÁRMACOS -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <h5 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-pills text-forest-700"></i>
+                            <span>Psicofármacos e Indicaciones</span>
+                        </h5>
+                        <button type="button" onclick="addFarmacoRow()" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-lg transition-colors flex items-center space-x-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                            <span>Agregar Fármaco</span>
+                        </button>
+                    </div>
+
+                    <div id="farmacos-container" class="space-y-3">
+                        <!-- Filas de fármacos dinámicas -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100 flex-shrink-0">
+                <button onclick="closeModal('modal-receta')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="saveReceta()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Guardar e Imprimir Receta</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 2: EDITAR DATOS DEL PACIENTE ================= -->
+    <div id="modal-editar-paciente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+            
+            <!-- Header Modal Editar -->
+            <div class="bg-gray-900 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
+                        <i class="fa-solid fa-pen-to-square text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-base leading-tight">Editar Ficha del Paciente</h4>
+                        <p class="text-xs text-gray-300">Modificación de ubicación y diagnóstico de internación</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-editar-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Formulario de Edición -->
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="edit-patient-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
+                    <input type="text" id="edit-nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sector *</label>
+                        <select id="edit-sector" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                            <option value="Sector Varones">Sector Varones</option>
+                            <option value="Sector Mujeres">Sector Mujeres</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Cama Asignada *</label>
+                        <input type="text" id="edit-cama" placeholder="Ej: Cama 08" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico Psiquiátrico de Internación *</label>
+                    <textarea id="edit-diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Estado / Nivel de Alerta *</label>
+                    <select id="edit-estado" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="Internado - Estable">Internado - Estable</option>
+                        <option value="En Aislamiento / Contención">En Aislamiento / Contención</option>
+                        <option value="Riesgo de Fuga / Vigilancia">Riesgo de Fuga / Vigilancia</option>
+                        <option value="Alta Programada">Alta Programada</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button onclick="closeModal('modal-editar-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Guardar Cambios</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICACIÓN -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">Acción realizada con éxito</span>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+        // BASE DE DATOS DE PACIENTES INTERNADOS (HOSPITAL PSIQUIÁTRICO)
+        let pacientes = [
+            {
+                id: 101,
+                nombre: "Gonzalo Fernández",
+                dni: "29.405.122",
+                fechaNacimiento: "12/03/1982",
+                edad: "42 años",
+                obraSocial: "PAMI / Programa Incluir Salud",
+                sector: "Sector Varones",
+                cama: "Cama 12",
+                diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
+                estado: "Internado - Estable",
+                estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+                medicoTratante: "Dr. Roberto Arlt",
+                fechaIngreso: "02/08/2026",
+                diasInternado: 12,
+                avatar: "GF",
+                avatarBg: "bg-sky-100 text-sky-800",
+                recetas: [
+                    {
+                        id: 1,
+                        fecha: "10/08/2026",
+                        medico: "Dr. Roberto Arlt (MP 8412)",
+                        medicaciones: [
+                            { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "Acompañar con alimentos" },
+                            { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", obs: "En caso de agitación psicomotriz" },
+                            { farmaco: "Valproato de Sodio", dosis: "500 mg", via: "Oral", frecuencia: "Cada 8 hs", obs: "Monitoreo hemograma" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 102,
+                nombre: "Valentina Rossi",
+                dni: "38.109.822",
+                fechaNacimiento: "05/11/1994",
+                edad: "29 años",
+                obraSocial: "OSEP Mendoza",
+                sector: "Sector Mujeres",
+                cama: "Cama 05",
+                diagnostico: "Trastorno Límite de la Personalidad - Descompensación Grave",
+                estado: "En Aislamiento / Contención",
+                estadoBadge: "bg-rose-100 text-rose-800 border-rose-200",
+                medicoTratante: "Dra. Ana María Gómez",
+                fechaIngreso: "09/08/2026",
+                diasInternado: 5,
+                avatar: "VR",
+                avatarBg: "bg-purple-100 text-purple-800",
+                recetas: [
+                    {
+                        id: 1,
+                        fecha: "09/08/2026",
+                        medico: "Dra. Ana María Gómez (MP 9120)",
+                        medicaciones: [
+                            { farmaco: "Quetiapina", dosis: "100 mg", via: "Oral", frecuencia: "Al acostarse", obs: "Controlar sedación matutina" },
+                            { farmaco: "Risperidona", dosis: "2 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "--" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 103,
+                nombre: "Esteban Benítez",
+                dni: "25.881.043",
+                fechaNacimiento: "18/07/1977",
+                edad: "47 años",
+                obraSocial: "Sin cobertura / Plan Sumar",
+                sector: "Sector Varones",
+                cama: "Cama 03",
+                diagnostico: "Esquizofrenia Paranoide (F20.0) - Reagudización",
+                estado: "Internado - Estable",
+                estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+                medicoTratante: "Dr. Carlos Fontanarrosa",
+                fechaIngreso: "28/07/2026",
+                diasInternado: 17,
+                avatar: "EB",
+                avatarBg: "bg-emerald-100 text-emerald-800",
+                recetas: [
+                    {
+                        id: 1,
+                        fecha: "28/07/2026",
+                        medico: "Dr. Carlos Fontanarrosa (MP 6540)",
+                        medicaciones: [
+                            { farmaco: "Ciamemazina (Levomepromazina)", dosis: "25 mg", via: "Oral", frecuencia: "Cada 8 hs", obs: "Prevención de síntomas neurolepticos" },
+                            { farmaco: "Haloperidol Decanoato", dosis: "50 mg", via: "Intramuscular", frecuencia: "C/28 días", obs: "Próxima dosis 25/08" }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 104,
+                nombre: "Camila Peralta",
+                dni: "41.320.911",
+                fechaNacimiento: "30/01/1998",
+                edad: "26 años",
+                obraSocial: "OSDE 210",
+                sector: "Sector Mujeres",
+                cama: "Cama 09",
+                diagnostico: "Depresión Grave con Riesgo Psicomotor (F32.3)",
+                estado: "Alta Programada",
+                estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
+                medicoTratante: "Dra. Ana María Gómez",
+                fechaIngreso: "15/07/2026",
+                diasInternado: 30,
+                avatar: "CP",
+                avatarBg: "bg-amber-100 text-amber-800",
+                recetas: [
+                    {
+                        id: 1,
+                        fecha: "12/08/2026",
+                        medico: "Dra. Ana María Gómez (MP 9120)",
+                        medicaciones: [
+                            { farmaco: "Carbonato de Litio", dosis: "300 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "Litemia semanal de control" },
+                            { farmaco: "Sertralina", dosis: "50 mg", via: "Oral", frecuencia: "Por la mañana", obs: "Tolerancia adecuada" }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let selectedPatientId = 101;
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            renderPacientes();
+            selectPatient(101);
+            // Cargar fecha de hoy por defecto en el modal
+            document.getElementById('receta-fecha').valueToDate = new Date();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('receta-fecha').value = today;
+        };
+
+        // RENDERIZAR LISTA DE PACIENTES
+        function renderPacientes() {
+            const container = document.getElementById('pacientes-container');
+            container.innerHTML = '';
+
+            document.getElementById('badge-patients-count').innerText = pacientes.length;
+
+            if (pacientes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        <i class="fa-solid fa-user-slash text-2xl text-gray-300 mb-2"></i>
+                        <p class="text-xs text-gray-500 font-medium">No se encontraron pacientes internados con los criterios ingresados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            pacientes.forEach(p => {
+                const isSelected = p.id === selectedPatientId;
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                    isSelected 
+                        ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' 
+                        : 'bg-white border-gray-200/80 hover:border-forest-600/50 hover:bg-gray-50/50'
+                }`;
+
+                card.onclick = (e) => {
+                    // Evitar trigger si hace click en un botón de acción
+                    if (!e.target.closest('button')) {
+                        selectPatient(p.id);
+                    }
+                };
+
+                card.innerHTML = `
+                    <div class="flex items-start space-x-3.5 min-w-0">
+                        <!-- Avatar Paciente -->
+                        <div class="w-11 h-11 rounded-full ${p.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0 border border-black/5 shadow-2xs mt-0.5">
+                            ${p.avatar}
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <!-- Nombre y Estado Badge -->
+                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre}</h4>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${p.estadoBadge}">
+                                    ${p.estado}
+                                </span>
+                            </div>
+
+                            <!-- Cama y Sector -->
+                            <div class="flex items-center space-x-2 text-xs mt-1">
+                                <span class="font-bold text-forest-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">${p.sector}</span>
+                                <span class="font-mono font-bold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">${p.cama}</span>
+                                <span class="text-gray-400">• DNI: ${p.dni}</span>
+                            </div>
+
+                            <!-- Diagnóstico Psiquiátrico -->
+                            <p class="text-xs text-gray-600 mt-1.5 line-clamp-1 italic">
+                                <i class="fa-solid fa-brain text-purple-600/70 mr-1"></i>${p.diagnostico}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN RÁPIDA DE LA TARJETA -->
+                    <div class="flex items-center space-x-2 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 justify-end flex-shrink-0">
+                        
+                        <!-- BOTÓN DE EDITAR SOLICITADO -->
+                        <button onclick="openEditModal(${p.id})" 
+                                title="Editar datos del paciente" 
+                                class="p-2 text-gray-500 hover:text-forest-800 hover:bg-emerald-50 rounded-lg transition-colors border border-gray-200">
+                            <i class="fa-solid fa-pen-to-square text-sm"></i>
+                        </button>
+
+                        <!-- BOTÓN "+ RECETA" -->
+                        <button onclick="openRecetaModal(${p.id})" 
+                                title="Prescribir nueva indicación médica psiquiátrica" 
+                                class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-2xs">
+                            <i class="fa-solid fa-file-prescription text-xs"></i>
+                            <span>+ Receta</span>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // SELECCIONAR Y MOSTRAR PERFIL COMPLETO + RECETARIO DEL PACIENTE EN EL PANEL DERECHO
+        function selectPatient(id) {
+            selectedPatientId = id;
+            renderPacientes();
+
+            const p = pacientes.find(item => item.id === id);
+            const panel = document.getElementById('patient-preview-panel');
+
+            if (!p) return;
+
+            // Construir HTML de las Recetas / Indicaciones
+            let recetasHtml = '';
+            if (p.recetas.length === 0) {
+                recetasHtml = `
+                    <div class="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-center">
+                        <p class="text-xs text-gray-400">Sin indicaciones médicas registradas.</p>
+                    </div>
+                `;
+            } else {
+                p.recetas.forEach((receta, idx) => {
+                    let medsRows = receta.medicaciones.map(m => `
+                        <tr class="border-b border-gray-100 text-[11px] hover:bg-gray-50/50">
+                            <td class="py-2 font-bold text-gray-800">${m.farmaco}</td>
+                            <td class="py-2 text-gray-700 font-mono">${m.dosis}</td>
+                            <td class="py-2 text-gray-600">${m.via}</td>
+                            <td class="py-2"><span class="bg-purple-50 text-purple-700 font-semibold px-1.5 py-0.5 rounded text-[10px]">${m.frecuencia}</span></td>
+                        </tr>
+                        ${m.obs && m.obs !== '--' ? `
+                            <tr class="border-b border-gray-100 text-[10px] text-gray-500 bg-amber-50/30">
+                                <td colspan="4" class="pb-1.5 pt-0 px-1 italic">
+                                    <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>Obs: ${m.obs}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    `).join('');
+
+                    recetasHtml += `
+                        <div class="bg-white rounded-xl border border-gray-200 p-3.5 space-y-2.5 shadow-2xs mb-3">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <div class="flex items-center space-x-1.5 text-xs text-forest-800 font-bold">
+                                    <i class="fa-solid fa-receipt"></i>
+                                    <span>Indicación N° ${p.recetas.length - idx}</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${receta.fecha}</span>
+                            </div>
+                            
+                            <p class="text-[11px] text-gray-500">
+                                <span class="font-semibold text-gray-700">Prescriptor:</span> ${receta.medico}
+                            </p>
+
+                            <!-- Tabla de psicofármacos -->
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100 font-semibold">
+                                        <th class="pb-1">Fármaco</th>
+                                        <th class="pb-1">Dosis</th>
+                                        <th class="pb-1">Vía</th>
+                                        <th class="pb-1">Frec.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${medsRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+            }
+
+            panel.innerHTML = `
+                <!-- Cabecera Paciente -->
+                <div class="text-center pb-4 border-b border-gray-100">
+                    <div class="w-16 h-16 rounded-full ${p.avatarBg} font-bold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner border border-black/5">
+                        ${p.avatar}
+                    </div>
+                    <h4 class="font-bold text-gray-900 text-base">${p.nombre}</h4>
+                    <p class="text-xs font-semibold text-forest-800 bg-forest-50 inline-block px-2.5 py-0.5 rounded-full border border-forest-200 mt-1">
+                        ${p.sector} • ${p.cama}
+                    </p>
+                </div>
+
+                <!-- Detalles Clínicos e Identificación -->
+                <div class="py-4 space-y-2.5 text-xs border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 font-medium">DNI:</span>
+                        <span class="font-mono font-semibold text-gray-800">${p.dni}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 font-medium">Edad / Nacimiento:</span>
+                        <span class="font-semibold text-gray-800">${p.edad} (${p.fechaNacimiento})</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 font-medium">Cobertura Med:</span>
+                        <span class="font-medium text-gray-800">${p.obraSocial}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 font-medium">Psiquiatra Tratante:</span>
+                        <span class="font-bold text-gray-900">${p.medicoTratante}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 font-medium">Ingreso / Días:</span>
+                        <span class="font-medium text-gray-800">${p.fechaIngreso} <span class="text-emerald-700 font-bold">(${p.diasInternado} días)</span></span>
+                    </div>
+
+                    <div class="pt-2 border-t border-gray-50">
+                        <span class="text-[11px] font-bold text-purple-900 uppercase tracking-wider block mb-1">Diagnóstico Psiquiátrico (CIE-10):</span>
+                        <div class="bg-purple-50/70 p-2.5 rounded-xl border border-purple-100 text-purple-950 font-medium text-xs leading-snug">
+                            ${p.diagnostico}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN RECETARIO / INDICACIONES MÉDICAS -->
+                <div class="pt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-gray-800 text-xs uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-pills text-forest-700"></i>
+                            <span>Indicación Médica Activa</span>
+                        </h4>
+                    </div>
+
+                    <!-- BOTÓN DESTACADO "+ AGREGAR NUEVA RECETA" -->
+                    <button onclick="openRecetaModal(${p.id})" 
+                            class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>+ Agregar Nueva Receta / Indicación</span>
+                    </button>
+
+                    <div class="mt-3">
+                        ${recetasHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- FILAS DINÁMICAS EN EL MODAL DE RECETA ---
+        function addFarmacoRow(farmaco = '', dosis = '', via = 'Oral', frecuencia = 'Cada 8 hs', obs = '') {
+            const container = document.getElementById('farmacos-container');
+            const rowId = Date.now() + Math.random().toString(36).substring(2, 5);
+
+            const row = document.createElement('div');
+            row.id = `row-${rowId}`;
+            row.className = "bg-gray-50 border border-gray-200 p-3 rounded-xl space-y-2 relative";
+
+            row.innerHTML = `
+                <button type="button" onclick="removeFarmacoRow('row-${rowId}')" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 p-1 text-xs">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Psicofármaco *</label>
+                        <input type="text" placeholder="Ej: Haloperidol / Clonazepam" value="${farmaco}" class="farmaco-name w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Dosis *</label>
+                        <input type="text" placeholder="Ej: 5 mg / 20 mg" value="${dosis}" class="farmaco-dosis w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Vía *</label>
+                        <select class="farmaco-via w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
+                            <option value="Oral" ${via === 'Oral' ? 'selected' : ''}>Oral</option>
+                            <option value="Sublingual" ${via === 'Sublingual' ? 'selected' : ''}>Sublingual</option>
+                            <option value="Intramuscular" ${via === 'Intramuscular' ? 'selected' : ''}>Intramuscular (IM)</option>
+                            <option value="Endovenosa" ${via === 'Endovenosa' ? 'selected' : ''}>Endovenosa (EV)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Frecuencia *</label>
+                        <select class="farmaco-frecuencia w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
+                            <option value="Cada 8 hs" ${frecuencia === 'Cada 8 hs' ? 'selected' : ''}>Cada 8 hs</option>
+                            <option value="Cada 12 hs" ${frecuencia === 'Cada 12 hs' ? 'selected' : ''}>Cada 12 hs</option>
+                            <option value="Cada 24 hs" ${frecuencia === 'Cada 24 hs' ? 'selected' : ''}>Cada 24 hs</option>
+                            <option value="Al acostarse" ${frecuencia === 'Al acostarse' ? 'selected' : ''}>Al acostarse</option>
+                            <option value="SOS / Requerimiento" ${frecuencia === 'SOS / Requerimiento' ? 'selected' : ''}>SOS / Requerimiento</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Criterio / Obs</label>
+                        <input type="text" placeholder="Ej: En caso de agitación" value="${obs}" class="farmaco-obs w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(row);
+        }
+
+        function removeFarmacoRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+        }
+
+        // ABRIR MODAL RECETA
+        function openRecetaModal(patientId) {
+            const p = pacientes.find(item => item.id === patientId);
+            if (!p) return;
+
+            selectedPatientId = patientId;
+            document.getElementById('receta-modal-paciente').innerText = `${p.nombre} (DNI: ${p.dni})`;
+            document.getElementById('receta-modal-cama').innerText = `${p.sector} - ${p.cama}`;
+            
+            // Limpiar contenedor de fármacos e insertar uno por defecto
+            document.getElementById('farmacos-container').innerHTML = '';
+            addFarmacoRow('Quetiapina', '100 mg', 'Oral', 'Al acostarse', 'Monitorear respuesta');
+
+            document.getElementById('modal-receta').classList.remove('hidden');
+        }
+
+        // GUARDAR NUEVA RECETA Y ACTUALIZAR VISTA EN TIEMPO REAL
+        function saveReceta() {
+            const p = pacientes.find(item => item.id === selectedPatientId);
+            if (!p) return;
+
+            const medico = document.getElementById('receta-medico').value;
+            const fechaRaw = document.getElementById('receta-fecha').value;
+            let fechaFormatted = "14/08/2026";
+            if (fechaRaw) {
+                const parts = fechaRaw.split('-');
+                if(parts.length === 3) fechaFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            // Recolectar fármacos ingresados
+            const farmacoRows = document.querySelectorAll('#farmacos-container > div');
+            const medicaciones = [];
+
+            farmacoRows.forEach(row => {
+                const name = row.querySelector('.farmaco-name').value.trim();
+                const dosis = row.querySelector('.farmaco-dosis').value.trim();
+                const via = row.querySelector('.farmaco-via').value;
+                const frecuencia = row.querySelector('.farmaco-frecuencia').value;
+                const obs = row.querySelector('.farmaco-obs').value.trim();
+
+                if (name && dosis) {
+                    medicaciones.push({
+                        farmaco: name,
+                        dosis: dosis,
+                        via: via,
+                        frecuencia: frecuencia,
+                        obs: obs || '--'
+                    });
+                }
+            });
+
+            if (medicaciones.length === 0) {
+                alert('Debe ingresar al menos un psicofármaco con su dosis.');
+                return;
+            }
+
+            // Agregar la nueva receta al inicio del historial del paciente
+            p.recetas.unshift({
+                id: Date.now(),
+                fecha: fechaFormatted,
+                medico: medico,
+                medicaciones: medicaciones
+            });
+
+            closeModal('modal-receta');
+            selectPatient(p.id);
+            showToast(`Nueva receta psiquiátrica guardada para ${p.nombre}.`);
+        }
+
+        // MODAL DE EDICIÓN DE PACIENTE
+        function openEditModal(patientId) {
+            const p = pacientes.find(item => item.id === patientId);
+            if (!p) return;
+
+            document.getElementById('edit-patient-id').value = p.id;
+            document.getElementById('edit-nombre').value = p.nombre;
+            document.getElementById('edit-sector').value = p.sector;
+            document.getElementById('edit-cama').value = p.cama;
+            document.getElementById('edit-diagnostico').value = p.diagnostico;
+            document.getElementById('edit-estado').value = p.estado;
+
+            document.getElementById('modal-editar-paciente').classList.remove('hidden');
+        }
+
+        function savePatientEdit() {
+            const id = parseInt(document.getElementById('edit-patient-id').value);
+            const p = pacientes.find(item => item.id === id);
+            if (!p) return;
+
+            p.nombre = document.getElementById('edit-nombre').value;
+            p.sector = document.getElementById('edit-sector').value;
+            p.cama = document.getElementById('edit-cama').value;
+            p.diagnostico = document.getElementById('edit-diagnostico').value;
+            p.estado = document.getElementById('edit-estado').value;
+
+            // Actualizar estilo del badge según el estado
+            if (p.estado.includes('Aislamiento')) {
+                p.estadoBadge = "bg-rose-100 text-rose-800 border-rose-200";
+            } else if (p.estado.includes('Alta')) {
+                p.estadoBadge = "bg-blue-100 text-blue-800 border-blue-200";
+            } else if (p.estado.includes('Fuga')) {
+                p.estadoBadge = "bg-amber-100 text-amber-800 border-amber-200";
+            } else {
+                p.estadoBadge = "bg-emerald-100 text-emerald-800 border-emerald-200";
+            }
+
+            closeModal('modal-editar-paciente');
+            selectPatient(id);
+            showToast(`Datos del paciente ${p.nombre} actualizados.`);
+        }
+
+        // BUSCADOR EN TIEMPO REAL
+        function filterPacientes() {
+            const query = document.getElementById('search-patient').value.toLowerCase();
+            const container = document.getElementById('pacientes-container');
+            container.innerHTML = '';
+
+            const filtered = pacientes.filter(p => 
+                p.nombre.toLowerCase().includes(query) ||
+                p.dni.toLowerCase().includes(query) ||
+                p.cama.toLowerCase().includes(query) ||
+                p.sector.toLowerCase().includes(query) ||
+                p.diagnostico.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        <p class="text-xs text-gray-400">Sin coincidencias para "${query}".</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const isSelected = p.id === selectedPatientId;
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                    isSelected ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' : 'bg-white border-gray-200/80'
+                }`;
+
+                card.onclick = (e) => {
+                    if (!e.target.closest('button')) selectPatient(p.id);
+                };
+
+                card.innerHTML = `
+                    <div class="flex items-start space-x-3.5 min-w-0">
+                        <div class="w-11 h-11 rounded-full ${p.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0">
+                            ${p.avatar}
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre}</h4>
+                            <p class="text-xs text-forest-800 font-semibold">${p.sector} - ${p.cama}</p>
+                            <p class="text-xs text-gray-500 italic truncate">${p.diagnostico}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openEditModal(${p.id})" class="p-2 text-gray-500 hover:text-forest-800 border rounded-lg"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                        <button onclick="openRecetaModal(${p.id})" class="px-3 py-1.5 bg-forest-800 text-white font-semibold text-xs rounded-lg">+ Receta</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // UTILIDADES
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+{% endblock %}

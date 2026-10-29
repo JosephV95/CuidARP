@@ -1,0 +1,333 @@
+{% extends 'layouts/sidebarBase.html' %}
+
+{% block contenido %}
+
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- Top Navigation Header -->
+        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+            <!-- Barra de búsqueda de habitación -->
+            <div class="relative w-full max-w-lg">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </span>
+                <input type="text" id="search-habitacion" onkeyup="filtrarHabitaciones()"
+                       placeholder="Buscar por número de habitación, cama o paciente..." 
+                       class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ F</kbd>
+                </div>
+            </div>
+
+            <!-- Derecha: Info Hospital / Fecha -->
+            <div class="flex items-center space-x-6">
+                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                </button>
+
+                <div class="text-right border-l border-gray-200 pl-6">
+                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</p>
+                    <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Área de Contenido Scrollable -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-6xl mx-auto space-y-6">
+
+                <!-- HEADER SECCIÓN -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Sectores y Camas</h2>
+                        <p class="text-xs text-gray-500 mt-1">Seleccione el sector hospitalario y realice registros directamente en las camas asignadas.</p>
+                    </div>
+                </div>
+
+                <!-- SELECTOR DE SECTORES (Nivel 1 de navegación) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="cambiarSector('varones')" id="btn-sector-varones" class="p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Sector 01</span>
+                            <h3 class="font-bold text-base mt-0.5">Sector Varones</h3>
+                        </div>
+                        <i class="fa-solid fa-person text-xl opacity-80"></i>
+                    </button>
+
+                    <button onclick="cambiarSector('mujeres')" id="btn-sector-mujeres" class="p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">Sector 02</span>
+                            <h3 class="font-bold text-base mt-0.5">Sector Mujeres</h3>
+                        </div>
+                        <i class="fa-solid fa-person-dress text-xl text-gray-400"></i>
+                    </button>
+                </div>
+
+                <!-- CONTENEDOR DE HABITACIONES EN MODO LISTA -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                        <h3 id="titulo-sector-actual" class="font-bold text-gray-800 text-base flex items-center space-x-2">
+                            <i class="fa-solid fa-door-open text-forest-800"></i>
+                            <span>Listado de Habitaciones y Camas - Sector Varones</span>
+                        </h3>
+                        <span class="text-xs text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</span>
+                    </div>
+
+                    <!-- LISTA DE HABITACIONES -->
+                    <div id="lista-habitaciones" class="space-y-3">
+                        <!-- Se renderiza por JavaScript -->
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= MODAL: REALIZAR REGISTRO ================= -->
+    <div id="modal-registro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+            
+            <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-file-medical text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 id="modal-titulo" class="font-bold text-base leading-tight">Realizar Registro de Enfermería</h4>
+                        <p id="modal-subtitulo" class="text-xs text-emerald-200">Habitación 101 - Cama 1</p>
+                    </div>
+                </div>
+                <button onclick="cerrarModalRegistro()" class="text-white/80 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Tipo de Registro:</label>
+                    <select id="tipo-registro" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="Signos Vitales y Estado">Control de Signos Vitales y Estado General</option>
+                        <option value="Administración de Medicación">Administración de Medicación Psiquiátrica</option>
+                        <option value="Control de Conducta">Evaluación de Conducta / Psiquiatría</option>
+                        <option value="Novedad de Turno">Novedad General del Turno</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Observaciones / Notas de Enfermería:</label>
+                    <textarea id="texto-registro" rows="3" placeholder="Ingrese los detalles del registro clínico..." class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button onclick="cerrarModalRegistro()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button onclick="guardarRegistro()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Guardar Registro</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE NOTIFICACIÓN -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">Registro guardado con éxito</span>
+    </div>
+
+    <!-- SCRIPT DE NAVEGACIÓN Y DATOS -->
+    <script>
+        const datosSectores = {
+            varones: {
+                nombre: "Sector Varones",
+                habitaciones: [
+                    {
+                        habitacion: "101",
+                        camas: [
+                            { numero: "Cama 1", estado: "Ocupada", paciente: "Juan Pérez", dni: "32.451.782", diag: "Esquizofrenia Paranoide" },
+                            { numero: "Cama 2", estado: "Disponible", paciente: null, dni: null, diag: null }
+                        ]
+                    },
+                    {
+                        habitacion: "102",
+                        camas: [
+                            { numero: "Cama 1", estado: "Ocupada", paciente: "Carlos Gómez", dni: "28.910.443", diag: "Trastorno Bipolar" },
+                            { numero: "Cama 2", estado: "Ocupada", paciente: "Esteban Ruarte", dni: "35.112.990", diag: "Depresión Mayor con Psicosis" }
+                        ]
+                    }
+                ]
+            },
+            mujeres: {
+                nombre: "Sector Mujeres",
+                habitaciones: [
+                    {
+                        habitacion: "201",
+                        camas: [
+                            { numero: "Cama 1", estado: "Ocupada", paciente: "María Gómez", dni: "33.102.554", diag: "Trastorno Esquizoafectivo" },
+                            { numero: "Cama 2", estado: "Disponible", paciente: null, dni: null, diag: null }
+                        ]
+                    },
+                    {
+                        habitacion: "202",
+                        camas: [
+                            { numero: "Cama 1", estado: "Ocupada", paciente: "Ana López", dni: "29.441.201", diag: "Psicosis Aguda" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let sectorActual = 'varones';
+
+        window.onload = function() {
+            renderHabitaciones();
+        };
+
+        function cambiarSector(sector) {
+            sectorActual = sector;
+            
+            // Estilos de botones de sector
+            ['varones', 'mujeres'].forEach(s => {
+                const btn = document.getElementById(`btn-sector-${s}`);
+                if(s === sector) {
+                    btn.className = "p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between";
+                } else {
+                    btn.className = "p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between";
+                }
+            });
+
+            document.getElementById('titulo-sector-actual').innerHTML = `
+                <i class="fa-solid fa-door-open text-forest-800"></i>
+                <span>Listado de Habitaciones y Camas - ${datosSectores[sector].nombre}</span>
+            `;
+
+            renderHabitaciones();
+        }
+
+        function renderHabitaciones(filtro = '') {
+            const container = document.getElementById('lista-habitaciones');
+            container.innerHTML = '';
+
+            const sectorData = datosSectores[sectorActual];
+            let habitacionesFiltradas = sectorData.habitaciones;
+
+            if(filtro.trim() !== '') {
+                const q = filtro.toLowerCase();
+                habitacionesFiltradas = sectorData.habitaciones.map(hab => {
+                    const camasMatching = hab.camas.filter(c => 
+                        hab.habitacion.toLowerCase().includes(q) ||
+                        c.numero.toLowerCase().includes(q) ||
+                        (c.paciente && c.paciente.toLowerCase().includes(q)) ||
+                        (c.dni && c.dni.includes(q))
+                    );
+                    return { ...hab, camas: camasMatching };
+                }).filter(hab => hab.camas.length > 0);
+            }
+
+            if(habitacionesFiltradas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 text-xs">
+                        No se encontraron habitaciones o camas que coincidan con la búsqueda.
+                    </div>
+                `;
+                return;
+            }
+
+            habitacionesFiltradas.forEach(hab => {
+                const habDiv = document.createElement('div');
+                habDiv.className = "border border-gray-200 rounded-xl p-4 bg-gray-50/50";
+
+                let camasHtml = '';
+                hab.camas.forEach(cama => {
+                    const estadoBadge = cama.estado === 'Ocupada' 
+                        ? `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">Ocupada</span>`
+                        : `<span class="px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full font-bold text-[10px]">Disponible</span>`;
+
+                    const pacienteInfo = cama.estado === 'Ocupada'
+                        ? `<div class="text-xs mt-1">
+                               <p class="font-bold text-gray-900">${cama.paciente} <span class="font-normal text-gray-500">(DNI: ${cama.dni})</span></p>
+                               <p class="text-[11px] text-forest-800 font-medium">Diagnóstico: ${cama.diag}</p>
+                           </div>`
+                        : `<p class="text-xs text-gray-400 mt-1 italic">Cama libre para internación</p>`;
+
+                    const botonRegistro = `<button onclick="abrirModalRegistro('${hab.habitacion}', '${cama.numero}', '${cama.paciente || 'Libre'}')" class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5">
+                        <i class="fa-solid fa-file-medical text-xs"></i>
+                        <span>Realizar Registro</span>
+                    </button>`;
+
+                    camasHtml += `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white rounded-lg border border-gray-200/80 gap-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-forest-50 text-forest-800 flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-bold text-sm text-gray-800">${cama.numero}</span>
+                                        ${estadoBadge}
+                                    </div>
+                                    ${pacienteInfo}
+                                </div>
+                            </div>
+                            <div>
+                                ${botonRegistro}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                habDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+                        <h4 class="font-bold text-sm text-forest-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-door-closed"></i>
+                            <span>Habitación ${hab.habitacion}</span>
+                        </h4>
+                        <span class="text-[11px] text-gray-500 font-semibold">${hab.camas.length} cama(s)</span>
+                    </div>
+                    <div class="space-y-2">
+                        ${camasHtml}
+                    </div>
+                `;
+
+                container.appendChild(habDiv);
+            });
+        }
+
+        function filtrarHabitaciones() {
+            const query = document.getElementById('search-habitacion').value;
+            renderHabitaciones(query);
+        }
+
+        function abrirModalRegistro(hab, cama, paciente) {
+            document.getElementById('modal-subtitulo').innerText = `Habitación ${hab} - ${cama} (${paciente})`;
+            document.getElementById('modal-registro').classList.remove('hidden');
+        }
+
+        function cerrarModalRegistro() {
+            document.getElementById('modal-registro').classList.add('hidden');
+        }
+
+        function guardarRegistro() {
+            cerrarModalRegistro();
+            showToast('Registro de enfermería guardado correctamente.');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+
+{% endblock %}
