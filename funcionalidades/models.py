@@ -49,7 +49,7 @@ class Enfermero(models.Model):
   )
 
   pin_sello = models.CharField(
-      max_length=6, verbose_name='PIN Numérico para Sello'
+      max_length=4, verbose_name='PIN Numérico para Sello'
   )
   password = models.CharField(
       max_length=128, verbose_name='Contraseña'
@@ -58,6 +58,11 @@ class Enfermero(models.Model):
   # Campo opcional para saber cuándo se registró
   fecha_registro = models.DateTimeField(
       auto_now_add=True, verbose_name='Fecha de Registro'
+  )
+  
+  # Campo para indicar si la cuenta ha sido verificada.
+  verificado = models.BooleanField(
+      default=False, verbose_name='Cuenta Verificada'
   )
 
   def __str__(self):
