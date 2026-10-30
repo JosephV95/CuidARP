@@ -99,25 +99,53 @@ def mostrar_registro_usuario(request):
 
 
 
-# ? Autenticacion del usuario (login) 
+#? Autenticacion del usuario (login) 
 def mostrar_login_usuario(request):
     if request.method == 'POST':
-        username_form = request.POST.get('username')
-        password_form = request.POST.get('password')
-        
-        user_exists = Enfermero.objects.filter(email=username_form, password=password_form).exists()
-        
-        if user_exists:
-            # Si el usuario existe, redirigimos a la página principal o dashboard
-            return redirect('home')
+        identificador = request.POST.get( 'username' )  # Puede ser DNI o Correo Electrónico
+        password_ingresada = request.POST.get('password')
+
+        # Buscamos al enfermero por DNI o por Email
+        enfermero = Enfermero.objects.filter(dni=identificador).first() or Enfermero.objects.filter(email=identificador).first()
+
+        if enfermero:
+             # Verificamos la contraseña
+            if enfermero.password == password_ingresada:
+
+                # 1. VALIDACIÓN CLAVE: ¿Está verificado por el Jefe de Enfermeros?
+                if not enfermero.verificado:
+                    messages.warning(
+                        request,
+                        'Su cuenta se encuentra pendiente de aprobación por un Jefe de'
+                        ' Enfermeros.',
+                    )
+                    return render(request, 'Login_Usuario.html')
+
+                # 2. CREAMOS LA SESIÓN: Guardamos los datos clave en la sesión del navegador
+                request.session['enfermero_id'] = enfermero.id
+                request.session['nombre_completo'] = (
+                    f'{enfermero.nombre} {enfermero.apellido}'
+                )
+                request.session['rol'] = enfermero.rol
+                request.session['servicio'] = enfermero.servicio
+
+                messages.success(request, f'¡Bienvenido/a, {enfermero.nombre}!')
+
+                # 3. Redirigimos al dashboard o panel principal (ejemplo: 'dashboard')
+                return redirect('gestion_enfermeros')  # Cambia por la URL de tu pantalla principal
+            else:
+                messages.error(
+                    request,
+                    'Contraseña incorrecta. Por favor, verifique sus datos.',
+                )
         else:
-            # Si el usuario no existe, podemos mostrar un mensaje de error o redirigir al login nuevamente
-            return render(request, 'Login_Usuario.html', {'error': 'Credenciales inválidas. Por favor, inténtelo de nuevo.'})
-        
-        
-    
-    else:
-        return render(request, 'Login_Usuario.html')
+            messages.error(
+                request,
+                'No se encontró ningún enfermero registrado con ese DNI o correo.',
+            )
+
+    return render(request, 'Login_Usuario.html')
+
 
 
 def mostrar_home(request):
