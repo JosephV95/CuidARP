@@ -52,17 +52,21 @@
 
             <!-- SELECTOR DE SECTORES (Fijos) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button onclick="cambiarSector('varones')" id="btn-sector-varones" class="p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between">
+                <button onclick="cambiarSector('varones')" id="btn-sector-varones"
+                    class="p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300" id="sub-varones">Sector 01</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300"
+                            id="sub-varones">Sector 01</span>
                         <h3 class="font-bold text-base mt-0.5">Sector Varones</h3>
                     </div>
                     <i class="fa-solid fa-person text-xl opacity-80"></i>
                 </button>
 
-                <button onclick="cambiarSector('mujeres')" id="btn-sector-mujeres" class="p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between">
+                <button onclick="cambiarSector('mujeres')" id="btn-sector-mujeres"
+                    class="p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400" id="sub-mujeres">Sector 02</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400"
+                            id="sub-mujeres">Sector 02</span>
                         <h3 class="font-bold text-base mt-0.5">Sector Mujeres</h3>
                     </div>
                     <i class="fa-solid fa-person-dress text-xl text-gray-400"></i>
@@ -89,57 +93,54 @@
     </main>
 </div>
 
-<!-- ================= MODAL: REALIZAR REGISTRO ================= -->
-<div id="modal-registro"
+<!-- ================= MODAL: ASIGNAR PACIENTE ================= -->
+<div id="modal-asignar"
     class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
     <div
         class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-
-        <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
-                    <i class="fa-solid fa-file-medical text-lg"></i>
+        <form id="form-asignar" method="POST" action="">
+            {% csrf_token %}
+            <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                        <i class="fa-solid fa-user-plus text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-base leading-tight">Asignar Paciente a Cama</h4>
+                        <p id="modal-asignar-subtitulo" class="text-xs text-emerald-200">Habitación - Cama</p>
+                    </div>
                 </div>
+                <button type="button" onclick="cerrarModalAsignar()"
+                    class="text-white/80 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs">
                 <div>
-                    <h4 id="modal-titulo" class="font-bold text-base leading-tight">Realizar Registro de Enfermería</h4>
-                    <p id="modal-subtitulo" class="text-xs text-emerald-200">Habitación 101 - Cama 1</p>
+                    <label class="block font-bold text-gray-700 mb-1">Seleccionar Paciente (Disponibles):</label>
+                    <select name="paciente_id" required
+                        class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <option value="">-- Seleccione un paciente sin cama --</option>
+                        {% for p in pacientes_libres %}
+                        <option value="{{ p.id }}">{{ p.nombre }} {{ p.apellido }} (DNI: {{ p.dni }})</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
-            <button onclick="cerrarModalRegistro()" class="text-white/80 hover:text-white p-1 rounded-lg">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-        </div>
 
-        <div class="p-6 space-y-4 text-xs">
-            <div>
-                <label class="block font-bold text-gray-700 mb-1">Tipo de Registro:</label>
-                <select id="tipo-registro"
-                    class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                    <option value="Signos Vitales y Estado">Control de Signos Vitales y Estado General</option>
-                    <option value="Administración de Medicación">Administración de Medicación Psiquiátrica</option>
-                    <option value="Control de Conducta">Evaluación de Conducta / Psiquiatría</option>
-                    <option value="Novedad de Turno">Novedad General del Turno</option>
-                </select>
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button type="button" onclick="cerrarModalAsignar()"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Confirmar Asignación</span>
+                </button>
             </div>
-
-            <div>
-                <label class="block font-bold text-gray-700 mb-1">Observaciones / Notas de Enfermería:</label>
-                <textarea id="texto-registro" rows="3" placeholder="Ingrese los detalles del registro clínico..."
-                    class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"></textarea>
-            </div>
-        </div>
-
-        <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-            <button onclick="cerrarModalRegistro()"
-                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                Cancelar
-            </button>
-            <button onclick="guardarRegistro()"
-                class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
-                <i class="fa-solid fa-check"></i>
-                <span>Guardar Registro</span>
-            </button>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -157,7 +158,7 @@
     // Ahora sí, JSON.parse leerá un objeto real con las claves 'varones' y 'mujeres'
     const datosSectores = JSON.parse(document.getElementById('sectores-data').textContent);
     console.log("Claves reales ahora:", Object.keys(datosSectores)); // Debería mostrar ['varones', 'mujeres']
-    
+
     let sectorActual = 'varones'; // Arranca por defecto en varones
 
     window.onload = function () {
@@ -203,21 +204,21 @@
         renderHabitaciones();
     }
 
+
     function renderHabitaciones(filtro = '') {
         const container = document.getElementById('lista-habitaciones');
         container.innerHTML = '';
 
         const sectorData = datosSectores[sectorActual];
 
-        // Validar si el objeto de este sector tiene habitaciones cargadas
         if (!sectorData || !sectorData.habitaciones || sectorData.habitaciones.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-12 text-gray-400 text-xs space-y-2">
-                    <i class="fa-solid fa-bed-pulse text-2xl text-gray-300"></i>
-                    <p class="font-medium">No hay habitaciones ni camas registradas en este sector actualmente.</p>
-                    <p class="text-[11px] text-gray-400">Puede agregarlas desde el panel de administración.</p>
-                </div>
-            `;
+                    <div class="text-center py-12 text-gray-400 text-xs space-y-2">
+                        <i class="fa-solid fa-bed-pulse text-2xl text-gray-300"></i>
+                        <p class="font-medium">No hay habitaciones ni camas registradas en este sector actualmente.</p>
+                        <p class="text-[11px] text-gray-400">Puede agregarlas desde el panel de administración.</p>
+                    </div>
+                `;
             return;
         }
 
@@ -238,10 +239,10 @@
 
         if (habitacionesFiltradas.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-8 text-gray-400 text-xs">
-                    No se encontraron habitaciones o camas que coincidan con la búsqueda.
-                </div>
-            `;
+                    <div class="text-center py-8 text-gray-400 text-xs">
+                        No se encontraron habitaciones o camas que coincidan con la búsqueda.
+                    </div>
+                `;
             return;
         }
 
@@ -257,71 +258,98 @@
 
                 const pacienteInfo = cama.estado === 'Ocupada'
                     ? `<div class="text-xs mt-1">
-                           <p class="font-bold text-gray-900">${cama.paciente} <span class="font-normal text-gray-500">(DNI: ${cama.dni})</span></p>
-                           <p class="text-[11px] text-forest-800 font-medium">Diagnóstico: ${cama.diag}</p>
-                       </div>`
+                               <p class="font-bold text-gray-900">${cama.paciente} <span class="font-normal text-gray-500">(DNI: ${cama.dni})</span></p>
+                               <p class="text-[11px] text-forest-800 font-medium">Diagnóstico: ${cama.diag}</p>
+                           </div>`
                     : `<p class="text-xs text-gray-400 mt-1 italic">Cama libre para internación</p>`;
 
-                const botonRegistro = `<button onclick="abrirModalRegistro('${hab.habitacion}', '${cama.numero}', '${cama.paciente || 'Libre'}')" class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5">
-                    <i class="fa-solid fa-file-medical text-xs"></i>
-                    <span>Realizar Registro</span>
-                </button>`;
+                // AQUÍ ESTABLECEMOS LOS NUEVOS BOTONES SEGÚN EL ESTADO
+                let botonesAccion = '';
+                if (cama.estado === 'Disponible') {
+                    // Botón para Asignar Paciente (abre modal de asignación)
+                    botonesAccion = `
+                            <button onclick="abrirModalAsignar(${cama.id}, '${hab.habitacion}', '${cama.numero}')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
+                                <i class="fa-solid fa-user-plus text-xs"></i>
+                               <span>Asignar Paciente</span>
+                            </button>
+                        `;
+                } else {
+                    // Botones si está ocupada: Ver Planilla (enlace) + Liberar Cama (botón)
+                    botonesAccion = `
+                            <div class="flex items-center space-x-2">
+                                <a href="/planillas/${cama.paciente_id}" class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
+                                    <i class="fa-solid fa-clipboard-user text-xs"></i>
+                                    <span>Ver Planilla</span>
+                                </a>
+                                <button onclick="liberarCama(${cama.id})" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-semibold text-xs rounded-lg transition-colors" title="Dar de alta / Liberar cama">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </button>
+                            </div>
+                        `;
+                }
 
                 camasHtml += `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white rounded-lg border border-gray-200/80 gap-3">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-forest-50 text-forest-800 flex items-center justify-center font-bold text-xs">
-                                <i class="fa-solid fa-bed"></i>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white rounded-lg border border-gray-200/80 gap-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-forest-50 text-forest-800 flex items-center justify-center font-bold text-xs">
+                                    <i class="fa-solid fa-bed"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-bold text-sm text-gray-800">${cama.numero}</span>
+                                        ${estadoBadge}
+                                    </div>
+                                    ${pacienteInfo}
+                                </div>
                             </div>
                             <div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-bold text-sm text-gray-800">${cama.numero}</span>
-                                    ${estadoBadge}
-                                </div>
-                                ${pacienteInfo}
+                                ${botonesAccion}
                             </div>
                         </div>
-                        <div>
-                            ${botonRegistro}
-                        </div>
-                    </div>
-                `;
+                    `;
             });
 
             habDiv.innerHTML = `
-                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
-                    <h4 class="font-bold text-sm text-forest-800 flex items-center space-x-2">
-                        <i class="fa-solid fa-door-closed"></i>
-                        <span>Habitación ${hab.habitacion}</span>
-                    </h4>
-                    <span class="text-[11px] text-gray-500 font-semibold">${hab.camas.length} cama(s)</span>
-                </div>
-                <div class="space-y-2">
-                    ${camasHtml}
-                </div>
-            `;
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+                        <h4 class="font-bold text-sm text-forest-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-door-closed"></i>
+                            <span>Habitación ${hab.habitacion}</span>
+                        </h4>
+                        <span class="text-[11px] text-gray-500 font-semibold">${hab.camas.length} cama(s)</span>
+                    </div>
+                    <div class="space-y-2">
+                        ${camasHtml}
+                    </div>
+                `;
 
             container.appendChild(habDiv);
         });
     }
 
+    // Funciones auxiliares para abrir y cerrar el modal de asignación de paciente a cama
+    function abrirModalAsignar(camaId, hab, camaNum) {
+        document.getElementById('modal-asignar-subtitulo').innerText = `Habitación ${hab} - ${camaNum}`;
+        // Asigna dinámicamente la ruta URL con el ID de la cama en el formulario
+        document.getElementById('form-asignar').action = `/cama/${camaId}/asignar/`;
+        document.getElementById('modal-asignar').classList.remove('hidden');
+    }
+
+    function cerrarModalAsignar() {
+        document.getElementById('modal-asignar').classList.add('hidden');
+    }
+
+    // funcion para liberar cama ocupada, redirigiendo a la vista de Django que maneja la liberación
+    function liberarCama(camaId) {
+        if (confirm("¿Confirma que desea dar de alta al paciente y liberar esta cama?")) {
+            // Redirige directamente a la URL de Django encargada de liberar la cama
+            window.location.href = `/cama/${camaId}/liberar/`;
+        }
+    }
+
+    // --------------- funciones de búsqueda y filtro ---------------
     function filtrarHabitaciones() {
         const query = document.getElementById('search-habitacion').value;
         renderHabitaciones(query);
-    }
-
-    function abrirModalRegistro(hab, cama, paciente) {
-        document.getElementById('modal-subtitulo').innerText = `Habitación ${hab} - ${cama} (${paciente})`;
-        document.getElementById('modal-registro').classList.remove('hidden');
-    }
-
-    function cerrarModalRegistro() {
-        document.getElementById('modal-registro').classList.add('hidden');
-    }
-
-    function guardarRegistro() {
-        cerrarModalRegistro();
-        showToast('Registro de enfermería guardado correctamente.');
     }
 
     function showToast(message) {

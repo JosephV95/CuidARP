@@ -7,7 +7,12 @@ urlpatterns = [
     # path('home/', views.home_view, name='home'),
     path('pacientes/', views.mostrar_pacientes, name='gestion_pacientes'),
     path('enfermeros/', views.mostrar_enfermeros, name='gestion_enfermeros'),
+    
+    # Rutas para la gestión de camas
     path('camas/', views.mostrar_sector_camas, name='sector_camas'),
+    path('cama/<int:cama_id>/liberar/', views.liberar_cama_view, name='liberar_cama'),
+    path('cama/<int:cama_id>/asignar/', views.asignar_paciente_view, name='asignar_paciente'),
+
     path('planillas/', views.mostrar_planillas, name='gestion_planillas'),
     
     path('login/', views.mostrar_login_usuario, name='login_usuario'),

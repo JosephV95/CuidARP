@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages  # Para mostrar alertas amigables
 from django.contrib.auth import authenticate, login, logout
 import json  # Para convertir datos de Python a JSON y enviarlos al template
 
 #Importar los modelos de la app funcionalidades
-from .models import Enfermero, Sector
+from .models import Enfermero, Paciente, Sector, Habitacion, Cama
 
 # Create your views here.
 def mostrar_registro_usuario(request):
@@ -167,7 +167,7 @@ def mostrar_enfermeros(request):
     return render(request, 'Gestion_Enfermeros.html')
 
 
-
+# Controladores para la gestión de camas y sectores
 def mostrar_sector_camas(request):
   datos_sectores = {}
 
@@ -176,9 +176,7 @@ def mostrar_sector_camas(request):
     sector = Sector.objects.filter(codigo=codigo_sector).first()
 
     habitaciones_list = []
-    nombre_sector = (
-        'Sector ' + codigo_sector.capitalize()
-    )  # Fallback de nombre
+    nombre_sector = ('Sector ' + codigo_sector.capitalize() ) 
 
     if sector:
       nombre_sector = sector.nombre
@@ -215,10 +213,42 @@ def mostrar_sector_camas(request):
         'nombre': nombre_sector,
         'habitaciones': habitaciones_list,
     }
+    
+  # FILTRAR SOLO PACIENTES QUE NO TIENEN CAMA ASIGNADA
+  pacientes_libres = Paciente.objects.filter(cama_asignada__isnull=True)
 
-  context = {'datos_sectores_json': datos_sectores}
+  context = {
+      'datos_sectores_json': datos_sectores,
+      'pacientes_libres': pacientes_libres,
+  }
 
   return render(request, 'Sector_Camas.html', context)
+
+# Vista para liberar una cama ocupada
+def liberar_cama_view(request, cama_id):
+    # Buscamos la cama o devolvemos 404 si no existe
+    cama = get_object_or_404(Cama, id=cama_id)
+    
+    # Liberamos la cama (dependiendo de cómo lo maneje tu modelo)
+    cama.paciente = None   #* Esto libera la cama al desvincular el paciente
+    cama.save()
+    
+    # Redirigimos de vuelta a la vista de sectores y camas
+    return redirect('sector_camas') # Asegúrate de usar el nombre de tu URL actual
+
+# NUEVA VISTA PARA PROCESAR LA ASIGNACIÓN
+def asignar_paciente_view(request, cama_id):
+  if request.method == 'POST':
+    cama = get_object_or_404(Cama, id=cama_id)
+    paciente_id = request.POST.get('paciente_id')
+
+    if paciente_id:
+      paciente = get_object_or_404(Paciente, id=paciente_id)
+      cama.paciente = paciente
+      cama.save()
+
+  return redirect('sector_camas')  # Reemplaza con el nombre de tu URL actual para esta vista
+
 
 
 def mostrar_planillas(request):
