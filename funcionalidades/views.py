@@ -123,6 +123,8 @@ def mostrar_login_usuario(request):
 
                 # 2. CREAMOS LA SESIÓN: Guardamos los datos clave en la sesión del navegador
                 request.session['enfermero_id'] = enfermero.id
+                request.session['nombre'] = enfermero.nombre
+                request.session['apellido'] = enfermero.apellido
                 request.session['nombre_completo'] = (
                     f'{enfermero.nombre} {enfermero.apellido}'
                 )
@@ -145,6 +147,12 @@ def mostrar_login_usuario(request):
             )
 
     return render(request, 'Login_Usuario.html')
+
+#? Cerrar sesión del usuario
+def cerrar_sesion(request):
+  request.session.flush()  # Borra toda la sesión del usuario
+  messages.info(request, 'Has cerrado sesión correctamente.')
+  return redirect('login_usuario')  # Redirige a tu vista de login
 
 
 
