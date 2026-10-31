@@ -114,3 +114,66 @@ class Paciente(models.Model):
     
     def __str__(self):
         return f'{self.apellido}, {self.nombre} - DNI: {self.dni}'
+    
+    
+
+ #* ----- Modelo de las tablas Sector, Habitacion y Cama
+class Sector(models.Model):
+  nombre = models.CharField(
+      max_length=50, unique=True, verbose_name='Nombre del Sector'
+  )
+  # Un código corto para identificarlo fácilmente en las URLs o funciones (ej: 'varones', 'mujeres')
+  codigo = models.CharField(
+      max_length=20, unique=True, verbose_name='Código de Sector'
+  )
+
+  def __str__(self):
+    return self.nombre
+
+
+class Habitacion(models.Model):
+  sector = models.ForeignKey(
+      Sector,
+      on_delete=models.CASCADE,
+      related_name='habitaciones', # Esto permite acceder a todas las habitaciones de un sector con sector.habitaciones.all()
+      verbose_name='Sector',
+  )
+  nombre = models.CharField(
+      max_length=50, verbose_name='Número / Nombre de Habitación'
+  )
+
+  def __str__(self):
+    return f'Habitación {self.nombre} ({self.sector.nombre})'
+
+
+class Cama(models.Model):
+  habitacion = models.ForeignKey(
+      Habitacion,
+      on_delete=models.CASCADE,
+      related_name='camas', # Esto permite HACER CONSULTAS INVERSAS Y  acceder a todas las camas de una habitación con habitacion.camas.all()
+      verbose_name='Habitación',
+  )
+  nombre = models.CharField(
+      max_length=50, verbose_name='Nombre / Número de Cama'
+  )
+
+  # Relación opcional con Paciente (una cama puede estar vacía o tener un paciente)
+  paciente = models.ForeignKey(
+      'Paciente',
+      on_delete=models.SET_NULL,  # Si borran al paciente, la cama queda libre (null) en vez de borrarse
+      null=True,
+      blank=True,
+      related_name='cama_asignada', # Esto permite acceder a la cama de un paciente con paciente.cama_asignada.all()
+      verbose_name='Paciente Asignado',
+  )
+
+  # Propiedad útil para saber su estado dinámicamente en el código
+  @property
+  def estado(self):
+    return 'Ocupada' if self.paciente else 'Disponible'
+
+  def __str__(self):
+    return (
+        f'{self.nombre} - Hab. {self.habitacion.nombre}'
+        f' ({self.habitacion.sector.nombre})'
+    )
