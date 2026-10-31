@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages  # Para mostrar alertas amigables
 from django.contrib.auth import authenticate, login, logout
+import json  # Para convertir datos de Python a JSON y enviarlos al template
 
 #Importar los modelos de la app funcionalidades
-from .models import Enfermero
+from .models import Enfermero, Sector
 
 # Create your views here.
 def mostrar_registro_usuario(request):
@@ -165,8 +166,60 @@ def mostrar_pacientes(request):
 def mostrar_enfermeros(request):
     return render(request, 'Gestion_Enfermeros.html')
 
-def mostrar_camas(request):
-    return render(request, 'Sector_Camas.html')
+
+
+def mostrar_sector_camas(request):
+  datos_sectores = {}
+
+  # Buscamos los dos sectores fijos por su código
+  for codigo_sector in ['varones', 'mujeres']:
+    sector = Sector.objects.filter(codigo=codigo_sector).first()
+
+    habitaciones_list = []
+    nombre_sector = (
+        'Sector ' + codigo_sector.capitalize()
+    )  # Fallback de nombre
+
+    if sector:
+      nombre_sector = sector.nombre
+      for hab in sector.habitaciones.all():
+        camas_list = []
+        for cama in hab.camas.all():
+          paciente_nombre = None
+          paciente_dni = None
+          paciente_diag = None
+
+          if cama.paciente:
+            paciente_nombre = (
+                f'{cama.paciente.nombre} {cama.paciente.apellido}'
+            )
+            paciente_dni = cama.paciente.dni
+            paciente_diag = cama.paciente.diagnostico
+
+          camas_list.append({
+              'id': cama.id,  # <-- Necesario para liberar o asignar
+              'numero': cama.nombre,
+              'estado': cama.estado,
+              'paciente': paciente_nombre,
+              'paciente_id': cama.paciente.id if cama.paciente else None,  # <-- Necesario para /planillas/{id}
+              'dni': paciente_dni,
+              'diag': paciente_diag,
+          })
+
+        habitaciones_list.append(
+            {'habitacion': hab.nombre, 'camas': camas_list}
+        )
+
+    # Guardamos con la clave exacta ('varones' o 'mujeres')
+    datos_sectores[codigo_sector] = {
+        'nombre': nombre_sector,
+        'habitaciones': habitaciones_list,
+    }
+
+  context = {'datos_sectores_json': datos_sectores}
+
+  return render(request, 'Sector_Camas.html', context)
+
 
 def mostrar_planillas(request):
     return render(request, 'Planillas.html')

@@ -7,7 +7,7 @@ urlpatterns = [
     # path('home/', views.home_view, name='home'),
     path('pacientes/', views.mostrar_pacientes, name='gestion_pacientes'),
     path('enfermeros/', views.mostrar_enfermeros, name='gestion_enfermeros'),
-    path('camas/', views.mostrar_camas, name='sector_camas'),
+    path('camas/', views.mostrar_sector_camas, name='sector_camas'),
     path('planillas/', views.mostrar_planillas, name='gestion_planillas'),
     
     path('login/', views.mostrar_login_usuario, name='login_usuario'),
