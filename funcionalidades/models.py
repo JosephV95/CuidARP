@@ -143,7 +143,7 @@ class Habitacion(models.Model):
   )
 
   def __str__(self):
-    return f'Habitación {self.nombre} ({self.sector.nombre})'
+    return f'{self.nombre} ({self.sector.nombre})'
 
 
 class Cama(models.Model):
