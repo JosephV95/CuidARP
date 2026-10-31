@@ -152,16 +152,21 @@
             <div class="pt-3 border-t border-forest-700 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-9 h-9 rounded-full bg-emerald-800 text-emerald-200 border border-emerald-600 flex items-center justify-center font-bold text-xs">
-                        JS
+                        <!-- Muestra la inicial del nombre en sesión, o 'U' por defecto -->
+                        {{ request.session.nombre|slice:":1"|default:"U" }}{{ request.session.apellido|slice:":1"|default:"V" }}
                     </div>
                     <div class="text-xs">
-                        <p class="font-semibold text-white leading-tight">Julia Suárez</p>
-                        <p class="text-gray-400 text-[11px]">Jefa de Enfermería</p>
+                        <!-- Muestra el nombre del usuario logueado o un valor por defecto -->
+                        <p class="font-semibold text-white leading-tight">{{ request.session.nombre_completo|default:"Usuario Invitado" }}</p>
+                        <!-- Muestra el rol o servicio, o un texto por defecto -->
+                        <p class="text-gray-400 text-[11px] capitalize">{{ request.session.rol|default:"Sin sesión" }}</p>
                     </div>
                 </div>
-                <button title="Cerrar sesión" class="text-gray-400 hover:text-white p-1 transition-colors">
+                
+                <!-- Botón de Cerrar Sesión conectado a la URL -->
+                <a href="{% url 'cerrar_sesion' %}" title="Cerrar sesión" class="text-gray-400 hover:text-white p-1 transition-colors">
                     <i class="fa-solid fa-right-from-bracket text-sm"></i>
-                </button>
+                </a>
             </div>
         </div>
     </aside>
