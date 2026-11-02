@@ -2,7 +2,6 @@
 
 {% block contenido %}
 
-
     <!-- ================= CONTENIDO PRINCIPAL ================= -->
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
@@ -29,7 +28,7 @@
                 </button>
 
                 <div class="text-right border-l border-gray-200 pl-6">
-                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra - Internación Psiquiátrica</p>
+                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra - Internación</p>
                     <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
                 </div>
             </div>
@@ -44,23 +43,23 @@
                     <div>
                         <div class="flex items-center space-x-2">
                             <h2 class="text-2xl font-bold text-gray-900">Nómina de Pacientes Internados</h2>
-                            <span class="bg-forest-100 text-forest-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-forest-500/20">
-                                Monitoreo Psiquiátrico Continuo
+                            <span id="badge-patients-count" class="bg-forest-100 text-forest-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-forest-500/20">
+                                0
                             </span>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">Administración de recetas, esquemas de medicación y control de enfermería por sector.</p>
+                        <p class="text-xs text-gray-500 mt-1">Gestión integral de fichas clínicas, asignación de camas y recetarios.</p>
                     </div>
 
-                    <!-- Botones de Acción Global -->
+                    <!-- Botón para nuevo paciente -->
                     <div class="flex items-center space-x-3">
-                        <button onclick="showToast('Módulo de admisión de nuevo paciente abierto.')" class="bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                        <button onclick="openNuevoPacienteModal()" class="bg-cyan-950 hover:bg-cyan-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
                             <i class="fa-solid fa-user-plus text-xs"></i>
-                            <span>Admitir Nuevo Paciente</span>
+                            <span>Agregar Nuevo Paciente</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- CONTENEDOR PRINCIPAL: GRILLA LISTADO + PERFIL DERECHA -->
+                <!-- CONTENEDOR PRINCIPAL: GRILLA LISTADO + PERFIL DERECHA (3 COLS ORIGINAL) -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <!-- COLUMNA IZQUIERDA (2 COLS): LISTADO DE PACIENTES -->
@@ -69,12 +68,9 @@
                             <div class="flex items-center justify-between pb-4 border-b border-gray-100">
                                 <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
                                     <i class="fa-solid fa-bed text-forest-800"></i>
-                                    <span>Pacientes en Unidad de Internación</span>
+                                    <span>Pacientes Registrados</span>
                                 </h3>
-                                <div class="flex items-center space-x-2 text-xs">
-                                    <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-semibold rounded-md border border-emerald-200">Sector Varones</span>
-                                    <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-semibold rounded-md border border-purple-200">Sector Mujeres</span>
-                                </div>
+                                <span class="text-xs text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</span>
                             </div>
 
                             <!-- CONTENEDOR TARJETAS PACIENTES -->
@@ -84,7 +80,7 @@
                         </div>
                     </div>
 
-                    <!-- COLUMNA DERECHA (1 COL): PERFIL COMPLETO Y RECETAS DEL PACIENTE -->
+                    <!-- COLUMNA DERECHA (1 COL): FICHA CLÍNICA & RECETARIO ORIGINAL -->
                     <div class="lg:col-span-1">
                         <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
                             <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
@@ -92,7 +88,6 @@
                                     <i class="fa-solid fa-hospital-user text-forest-800"></i>
                                     <span>Ficha Clínica & Recetario</span>
                                 </h3>
-                                <span class="text-[10px] bg-forest-50 text-forest-800 font-semibold px-2 py-0.5 rounded-full border border-forest-200">En vista</span>
                             </div>
 
                             <!-- CONTENIDO DINÁMICO DEL PERFIL Y RECETA -->
@@ -108,92 +103,150 @@
         </main>
     </div>
 
-    <!-- ================= MODAL 1: AGREGAR NUEVA RECETA / INDICACIÓN MÉDICA ================= -->
-    <div id="modal-receta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+    <!-- ================= MODAL 1: AGREGAR NUEVO PACIENTE ================= -->
+    <div id="modal-nuevo-paciente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
             
-            <!-- Header Modal Receta -->
-            <div class="bg-forest-800 text-white p-5 flex items-center justify-between flex-shrink-0">
+            <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-300 border border-white/20">
-                        <i class="fa-solid fa-file-prescription text-lg"></i>
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-300">
+                        <i class="fa-solid fa-user-plus text-lg"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-base leading-tight">Prescribir Indicación Médica Psiquiátrica</h4>
-                        <p class="text-xs text-emerald-200/80">CuidARP - Registro de Esquema Farmacológico Internación</p>
+                        <h4 class="font-bold text-base leading-tight">Agregar Nuevo Paciente</h4>
+                        <p class="text-xs text-emerald-200/80">Ingreso de ficha clínica al sistema</p>
                     </div>
                 </div>
-                <button onclick="closeModal('modal-receta')" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <button onclick="closeModal('modal-nuevo-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <!-- Cuerpo Modal Scrollable -->
-            <div class="p-6 overflow-y-auto space-y-5">
-                <!-- Info Paciente Contextual -->
-                <div class="bg-forest-50 border border-forest-200/80 rounded-xl p-3.5 flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] text-forest-700 font-semibold uppercase tracking-wider">Paciente Destino</span>
-                        <h5 id="receta-modal-paciente" class="font-bold text-forest-900 text-sm">--</h5>
+            <form id="form-nuevo-paciente" method="POST" action="">
+                {% csrf_token %}
+                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
+                            <input type="text" id="add-nombre" name="nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
+                            <input type="text" id="add-apellido" name="apellido" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
                     </div>
-                    <div class="text-right text-xs">
-                        <span id="receta-modal-cama" class="font-mono bg-white px-2 py-1 rounded border border-forest-200 text-forest-800 font-bold">--</span>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
+                            <input type="text" id="add-dni" name="dni" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                            <input type="date" id="add-fecha_nacimiento" name="fecha_nacimiento" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
+                            <input type="email" id="add-email" name="email" placeholder="familiar@correo.com" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
+                            <input type="text" id="add-obra_social" name="obra_social" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
+                            <select id="add-sexo_paciente" name="sexo_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="No binario">No binario</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
+                            <input type="text" id="add-telefono" name="telefono" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
+                            <select id="add-estado_paciente" name="estado_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                                <option value="Internado" selected>Internado</option>
+                                <option value="De Alta">De Alta</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
+                            <input type="text" id="add-direccion" name="direccion" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <!-- ASIGNACIÓN DE UBICACIÓN -->
+                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-3">
+                        <span class="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">Asignación de Ubicación</span>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Sector *</label>
+                                <select id="add-sector" name="sector" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                                    <option value="Sector Varones">Sector Varones</option>
+                                    <option value="Sector Mujeres">Sector Mujeres</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Habitación *</label>
+                                <select id="add-habitacion" name="habitacion" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                                    <option value="1">Hab. 01</option>
+                                    <option value="2">Hab. 02</option>
+                                    <option value="3">Hab. 03</option>
+                                    <option value="4">Hab. 04</option>
+                                    <option value="5">Hab. 05</option>
+                                    <option value="6">Hab. 06</option>
+                                    <option value="7">Hab. 07</option>
+                                    <option value="8">Hab. 08</option>
+                                    <option value="9">Hab. 09</option>
+                                    <option value="10">Hab. 10</option>
+                                    <option value="11">Hab. 11</option>
+                                    <option value="12">Hab. 12</option>
+                                    <option value="13">Hab. 13</option>
+                                    <option value="14">Hab. 14</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Cama *</label>
+                                <input type="text" id="add-cama" name="cama" placeholder="Ej: Cama 02" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
+                        <textarea id="add-diagnostico" name="diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required></textarea>
                     </div>
                 </div>
 
-                <!-- Datos de la Prescripción -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Médico Psiquiatra Prescriptor *</label>
-                        <select id="receta-medico" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none font-medium">
-                            <option value="Dr. Roberto Arlt (MP 8412)">Dr. Roberto Arlt (MP 8412)</option>
-                            <option value="Dra. Ana María Gómez (MP 9120)">Dra. Ana María Gómez (MP 9120)</option>
-                            <option value="Dr. Carlos Fontanarrosa (MP 6540)">Dr. Carlos Fontanarrosa (MP 6540)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Prescripción *</label>
-                        <input type="date" id="receta-fecha" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                    </div>
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                    <button type="button" onclick="closeModal('modal-nuevo-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="saveNuevoPaciente()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Guardar Paciente</span>
+                    </button>
                 </div>
-
-                <!-- LISTA DINÁMICA DE FÁRMACOS -->
-                <div class="space-y-3 pt-2">
-                    <div class="flex items-center justify-between">
-                        <h5 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-1.5">
-                            <i class="fa-solid fa-pills text-forest-700"></i>
-                            <span>Psicofármacos e Indicaciones</span>
-                        </h5>
-                        <button type="button" onclick="addFarmacoRow()" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-lg transition-colors flex items-center space-x-1">
-                            <i class="fa-solid fa-plus text-[10px]"></i>
-                            <span>Agregar Fármaco</span>
-                        </button>
-                    </div>
-
-                    <div id="farmacos-container" class="space-y-3">
-                        <!-- Filas de fármacos dinámicas -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Modal -->
-            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100 flex-shrink-0">
-                <button onclick="closeModal('modal-receta')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                    Cancelar
-                </button>
-                <button onclick="saveReceta()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Guardar e Imprimir Receta</span>
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 
     <!-- ================= MODAL 2: EDITAR DATOS DEL PACIENTE ================= -->
     <div id="modal-editar-paciente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
             
-            <!-- Header Modal Editar -->
             <div class="bg-gray-900 text-white p-5 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
@@ -201,7 +254,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-base leading-tight">Editar Ficha del Paciente</h4>
-                        <p class="text-xs text-gray-300">Modificación de ubicación y diagnóstico de internación</p>
+                        <p class="text-xs text-gray-300">Modificación de datos del registro</p>
                     </div>
                 </div>
                 <button onclick="closeModal('modal-editar-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
@@ -209,55 +262,201 @@
                 </button>
             </div>
 
-            <!-- Formulario de Edición -->
-            <div class="p-6 space-y-4">
-                <input type="hidden" id="edit-patient-id">
-                
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Nombre Completo *</label>
-                    <input type="text" id="edit-nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+            <form id="form-editar-paciente" method="POST" action="">
+                {% csrf_token %}
+                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                    <input type="hidden" id="edit-patient-id" name="id">
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
+                            <input type="text" id="edit-nombre" name="nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
+                            <input type="text" id="edit-apellido" name="apellido" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
+                            <input type="text" id="edit-dni" name="dni" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                            <input type="date" id="edit-fecha_nacimiento" name="fecha_nacimiento" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
+                            <input type="email" id="edit-email" name="email" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
+                            <input type="text" id="edit-obra_social" name="obra_social" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
+                            <select id="edit-sexo_paciente" name="sexo_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="No binario">No binario</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
+                            <input type="text" id="edit-telefono" name="telefono" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
+                            <select id="edit-estado_paciente" name="estado_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                                <option value="Internado">Internado</option>
+                                <option value="De Alta">De Alta</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
+                            <input type="text" id="edit-direccion" name="direccion" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <!-- UBICACIÓN DE EDICIÓN -->
+                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-3">
+                        <span class="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">Ubicación de Internación</span>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Sector *</label>
+                                <select id="edit-sector" name="sector" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                                    <option value="Sector Varones">Sector Varones</option>
+                                    <option value="Sector Mujeres">Sector Mujeres</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Habitación *</label>
+                                <select id="edit-habitacion" name="habitacion" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                                    <option value="1">Hab. 01</option>
+                                    <option value="2">Hab. 02</option>
+                                    <option value="3">Hab. 03</option>
+                                    <option value="4">Hab. 04</option>
+                                    <option value="5">Hab. 05</option>
+                                    <option value="6">Hab. 06</option>
+                                    <option value="7">Hab. 07</option>
+                                    <option value="8">Hab. 08</option>
+                                    <option value="9">Hab. 09</option>
+                                    <option value="10">Hab. 10</option>
+                                    <option value="11">Hab. 11</option>
+                                    <option value="12">Hab. 12</option>
+                                    <option value="13">Hab. 13</option>
+                                    <option value="14">Hab. 14</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Cama *</label>
+                                <input type="text" id="edit-cama" name="cama" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
+                        <textarea id="edit-diagnostico" name="diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required></textarea>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Sector *</label>
-                        <select id="edit-sector" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                            <option value="Sector Varones">Sector Varones</option>
-                            <option value="Sector Mujeres">Sector Mujeres</option>
-                        </select>
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                    <button type="button" onclick="closeModal('modal-editar-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Guardar Cambios</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 3: AGREGAR NUEVA RECETA ================= -->
+    <div id="modal-receta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+            
+            <div class="bg-forest-800 text-white p-5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-300 border border-white/20">
+                        <i class="fa-solid fa-file-prescription text-lg"></i>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Cama Asignada *</label>
-                        <input type="text" id="edit-cama" placeholder="Ej: Cama 08" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                        <h4 class="font-bold text-base leading-tight">Prescribir Receta Médica</h4>
+                        <p class="text-xs text-emerald-200/80">CuidARP - Registro de Medicación</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-receta')" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="form-receta" method="POST" action="" class="flex flex-col flex-1 overflow-hidden">
+                {% csrf_token %}
+                <div class="p-6 overflow-y-auto space-y-5">
+                    <div class="bg-forest-50 border border-forest-200/80 rounded-xl p-3.5 flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] text-forest-700 font-semibold uppercase tracking-wider">Paciente Destino</span>
+                            <h5 id="receta-modal-paciente" class="font-bold text-forest-900 text-sm">--</h5>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">N° de Receta *</label>
+                            <input type="number" id="receta-numero" name="numero_receta" placeholder="Ej: 1042" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Médico prescriptor *</label>
+                            <input type="text" id="receta-medico" name="medico_prescriptor" placeholder="Nombre del médico" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none font-medium" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha *</label>
+                            <input type="date" id="receta-fecha" name="fecha" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between">
+                            <h5 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-1.5">
+                                <i class="fa-solid fa-pills text-forest-700"></i>
+                                <span>Fármacos e Indicaciones</span>
+                            </h5>
+                            <button type="button" onclick="addFarmacoRow()" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-lg transition-colors flex items-center space-x-1">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                <span>Agregar Fármaco</span>
+                            </button>
+                        </div>
+
+                        <div id="farmacos-container" class="space-y-3">
+                            <!-- Filas dinámicas de fármacos -->
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico Psiquiátrico de Internación *</label>
-                    <textarea id="edit-diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"></textarea>
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100 flex-shrink-0">
+                    <button type="button" onclick="closeModal('modal-receta')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="saveReceta()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Guardar Receta</span>
+                    </button>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Estado / Nivel de Alerta *</label>
-                    <select id="edit-estado" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                        <option value="Internado - Estable">Internado - Estable</option>
-                        <option value="En Aislamiento / Contención">En Aislamiento / Contención</option>
-                        <option value="Riesgo de Fuga / Vigilancia">Riesgo de Fuga / Vigilancia</option>
-                        <option value="Alta Programada">Alta Programada</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Footer Modal -->
-            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-                <button onclick="closeModal('modal-editar-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                    Cancelar
-                </button>
-                <button onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
-                    <i class="fa-solid fa-check"></i>
-                    <span>Guardar Cambios</span>
-                </button>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -267,123 +466,71 @@
         <span id="toast-msg">Acción realizada con éxito</span>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT -->
+    <!-- LÓGICA JAVASCRIPT CON CAMPOS EXACTOS DE MODELS.PY -->
     <script>
-        // BASE DE DATOS DE PACIENTES INTERNADOS (HOSPITAL PSIQUIÁTRICO)
+        // ESTRUCTURA DE PACIENTES ADAPTADA AL MODELO DJANGO (models.py)
         let pacientes = [
             {
                 id: 101,
-                nombre: "Gonzalo Fernández",
-                dni: "29.405.122",
-                fechaNacimiento: "12/03/1982",
-                edad: "42 años",
-                obraSocial: "PAMI / Programa Incluir Salud",
-                sector: "Sector Varones",
-                cama: "Cama 12",
-                diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
-                estado: "Internado - Estable",
+                nombre: "Gonzalo",
+                apellido: "Fernández",
+                dni: "29405122",
+                fecha_nacimiento: "1982-03-12",
+                fechaNacimientoDisplay: "12/03/1982",
+                email: "g.fernandez@correo.com",
+                obra_social: "PAMI / Incluir Salud",
+                sexo_paciente: "Masculino",
+                telefono: "261458963",
+                direccion: "San Martín 450, Mendoza",
+                estado_paciente: "Internado",
                 estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                medicoTratante: "Dr. Roberto Arlt",
-                fechaIngreso: "02/08/2026",
-                diasInternado: 12,
+                diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
+                sector: "Sector Varones",
+                habitacion: "02",
+                cama: "Cama 12",
                 avatar: "GF",
                 avatarBg: "bg-sky-100 text-sky-800",
                 recetas: [
                     {
-                        id: 1,
+                        idReceta: 1001,
                         fecha: "10/08/2026",
-                        medico: "Dr. Roberto Arlt (MP 8412)",
+                        medico: "Dr. Roberto Arlt",
+                        estado: "Activo",
                         medicaciones: [
-                            { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "Acompañar con alimentos" },
-                            { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", obs: "En caso de agitación psicomotriz" },
-                            { farmaco: "Valproato de Sodio", dosis: "500 mg", via: "Oral", frecuencia: "Cada 8 hs", obs: "Monitoreo hemograma" }
+                            { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", observaciones: "Acompañar con alimentos" },
+                            { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", observaciones: "Caso de agitación" }
                         ]
                     }
                 ]
             },
             {
                 id: 102,
-                nombre: "Valentina Rossi",
-                dni: "38.109.822",
-                fechaNacimiento: "05/11/1994",
-                edad: "29 años",
-                obraSocial: "OSEP Mendoza",
+                nombre: "Valentina",
+                apellido: "Rossi",
+                dni: "38109822",
+                fecha_nacimiento: "1994-11-05",
+                fechaNacimientoDisplay: "05/11/1994",
+                email: "",
+                obra_social: "OSEP Mendoza",
+                sexo_paciente: "Femenino",
+                telefono: "261789412",
+                direccion: "Belgrano 1200, Godoy Cruz",
+                estado_paciente: "De Alta",
+                estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
+                diagnostico: "Trastorno Límite de la Personalidad",
                 sector: "Sector Mujeres",
+                habitacion: "05",
                 cama: "Cama 05",
-                diagnostico: "Trastorno Límite de la Personalidad - Descompensación Grave",
-                estado: "En Aislamiento / Contención",
-                estadoBadge: "bg-rose-100 text-rose-800 border-rose-200",
-                medicoTratante: "Dra. Ana María Gómez",
-                fechaIngreso: "09/08/2026",
-                diasInternado: 5,
                 avatar: "VR",
                 avatarBg: "bg-purple-100 text-purple-800",
                 recetas: [
                     {
-                        id: 1,
+                        idReceta: 1002,
                         fecha: "09/08/2026",
-                        medico: "Dra. Ana María Gómez (MP 9120)",
+                        medico: "Dra. Ana Gómez",
+                        estado: "Vencido",
                         medicaciones: [
-                            { farmaco: "Quetiapina", dosis: "100 mg", via: "Oral", frecuencia: "Al acostarse", obs: "Controlar sedación matutina" },
-                            { farmaco: "Risperidona", dosis: "2 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "--" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 103,
-                nombre: "Esteban Benítez",
-                dni: "25.881.043",
-                fechaNacimiento: "18/07/1977",
-                edad: "47 años",
-                obraSocial: "Sin cobertura / Plan Sumar",
-                sector: "Sector Varones",
-                cama: "Cama 03",
-                diagnostico: "Esquizofrenia Paranoide (F20.0) - Reagudización",
-                estado: "Internado - Estable",
-                estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                medicoTratante: "Dr. Carlos Fontanarrosa",
-                fechaIngreso: "28/07/2026",
-                diasInternado: 17,
-                avatar: "EB",
-                avatarBg: "bg-emerald-100 text-emerald-800",
-                recetas: [
-                    {
-                        id: 1,
-                        fecha: "28/07/2026",
-                        medico: "Dr. Carlos Fontanarrosa (MP 6540)",
-                        medicaciones: [
-                            { farmaco: "Ciamemazina (Levomepromazina)", dosis: "25 mg", via: "Oral", frecuencia: "Cada 8 hs", obs: "Prevención de síntomas neurolepticos" },
-                            { farmaco: "Haloperidol Decanoato", dosis: "50 mg", via: "Intramuscular", frecuencia: "C/28 días", obs: "Próxima dosis 25/08" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 104,
-                nombre: "Camila Peralta",
-                dni: "41.320.911",
-                fechaNacimiento: "30/01/1998",
-                edad: "26 años",
-                obraSocial: "OSDE 210",
-                sector: "Sector Mujeres",
-                cama: "Cama 09",
-                diagnostico: "Depresión Grave con Riesgo Psicomotor (F32.3)",
-                estado: "Alta Programada",
-                estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
-                medicoTratante: "Dra. Ana María Gómez",
-                fechaIngreso: "15/07/2026",
-                diasInternado: 30,
-                avatar: "CP",
-                avatarBg: "bg-amber-100 text-amber-800",
-                recetas: [
-                    {
-                        id: 1,
-                        fecha: "12/08/2026",
-                        medico: "Dra. Ana María Gómez (MP 9120)",
-                        medicaciones: [
-                            { farmaco: "Carbonato de Litio", dosis: "300 mg", via: "Oral", frecuencia: "Cada 12 hs", obs: "Litemia semanal de control" },
-                            { farmaco: "Sertralina", dosis: "50 mg", via: "Oral", frecuencia: "Por la mañana", obs: "Tolerancia adecuada" }
+                            { farmaco: "Quetiapina", dosis: "100 mg", via: "Subcutánea", frecuencia: "Al acostarse", observaciones: "Controlar tolerancia" }
                         ]
                     }
                 ]
@@ -392,28 +539,26 @@
 
         let selectedPatientId = 101;
 
-        // INICIALIZACIÓN
         window.onload = function() {
             renderPacientes();
             selectPatient(101);
-            // Cargar fecha de hoy por defecto en el modal
-            document.getElementById('receta-fecha').valueToDate = new Date();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('receta-fecha').value = today;
         };
 
-        // RENDERIZAR LISTA DE PACIENTES
+        // CONTAR PACIENTES INTERNADOS Y RENDERIZAR TARJETAS
         function renderPacientes() {
             const container = document.getElementById('pacientes-container');
             container.innerHTML = '';
 
-            document.getElementById('badge-patients-count').innerText = pacientes.length;
+            // Filtrar y contar solo pacientes internados para el badge del título
+            const internadosCount = pacientes.filter(p => p.estado_paciente === 'Internado').length;
+            document.getElementById('badge-patients-count').innerText = internadosCount;
 
             if (pacientes.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                        <i class="fa-solid fa-user-slash text-2xl text-gray-300 mb-2"></i>
-                        <p class="text-xs text-gray-500 font-medium">No se encontraron pacientes internados con los criterios ingresados.</p>
+                        <p class="text-xs text-gray-500 font-medium">No hay pacientes registrados en el sistema.</p>
                     </div>
                 `;
                 return;
@@ -429,7 +574,6 @@
                 }`;
 
                 card.onclick = (e) => {
-                    // Evitar trigger si hace click en un botón de acción
                     if (!e.target.closest('button')) {
                         selectPatient(p.id);
                     }
@@ -437,50 +581,37 @@
 
                 card.innerHTML = `
                     <div class="flex items-start space-x-3.5 min-w-0">
-                        <!-- Avatar Paciente -->
                         <div class="w-11 h-11 rounded-full ${p.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0 border border-black/5 shadow-2xs mt-0.5">
                             ${p.avatar}
                         </div>
 
                         <div class="min-w-0 flex-1">
-                            <!-- Nombre y Estado Badge -->
                             <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre}</h4>
+                                <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre} ${p.apellido}</h4>
                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${p.estadoBadge}">
-                                    ${p.estado}
+                                    ${p.estado_paciente}
                                 </span>
                             </div>
 
-                            <!-- Cama y Sector -->
+                            <!-- Cama, Habitación y Sector -->
                             <div class="flex items-center space-x-2 text-xs mt-1">
                                 <span class="font-bold text-forest-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">${p.sector}</span>
-                                <span class="font-mono font-bold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">${p.cama}</span>
+                                <span class="font-mono font-bold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">Hab. ${p.habitacion} • ${p.cama}</span>
                                 <span class="text-gray-400">• DNI: ${p.dni}</span>
                             </div>
 
-                            <!-- Diagnóstico Psiquiátrico -->
                             <p class="text-xs text-gray-600 mt-1.5 line-clamp-1 italic">
-                                <i class="fa-solid fa-brain text-purple-600/70 mr-1"></i>${p.diagnostico}
+                                <i class="fa-solid fa-stethoscope text-forest-700 mr-1"></i>${p.diagnostico}
                             </p>
                         </div>
                     </div>
 
-                    <!-- BOTONES DE ACCIÓN RÁPIDA DE LA TARJETA -->
+                    <!-- BOTÓN ÚNICO DE EDICIÓN -->
                     <div class="flex items-center space-x-2 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 justify-end flex-shrink-0">
-                        
-                        <!-- BOTÓN DE EDITAR SOLICITADO -->
                         <button onclick="openEditModal(${p.id})" 
                                 title="Editar datos del paciente" 
                                 class="p-2 text-gray-500 hover:text-forest-800 hover:bg-emerald-50 rounded-lg transition-colors border border-gray-200">
                             <i class="fa-solid fa-pen-to-square text-sm"></i>
-                        </button>
-
-                        <!-- BOTÓN "+ RECETA" -->
-                        <button onclick="openRecetaModal(${p.id})" 
-                                title="Prescribir nueva indicación médica psiquiátrica" 
-                                class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-2xs">
-                            <i class="fa-solid fa-file-prescription text-xs"></i>
-                            <span>+ Receta</span>
                         </button>
                     </div>
                 `;
@@ -489,7 +620,7 @@
             });
         }
 
-        // SELECCIONAR Y MOSTRAR PERFIL COMPLETO + RECETARIO DEL PACIENTE EN EL PANEL DERECHO
+        // SELECCIONAR Y MOSTRAR PERFIL COMPLETO EN EL PANEL DERECHO
         function selectPatient(id) {
             selectedPatientId = id;
             renderPacientes();
@@ -499,16 +630,15 @@
 
             if (!p) return;
 
-            // Construir HTML de las Recetas / Indicaciones
             let recetasHtml = '';
             if (p.recetas.length === 0) {
                 recetasHtml = `
                     <div class="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-center">
-                        <p class="text-xs text-gray-400">Sin indicaciones médicas registradas.</p>
+                        <p class="text-xs text-gray-400">Sin recetas registradas.</p>
                     </div>
                 `;
             } else {
-                p.recetas.forEach((receta, idx) => {
+                p.recetas.forEach((receta) => {
                     let medsRows = receta.medicaciones.map(m => `
                         <tr class="border-b border-gray-100 text-[11px] hover:bg-gray-50/50">
                             <td class="py-2 font-bold text-gray-800">${m.farmaco}</td>
@@ -516,30 +646,33 @@
                             <td class="py-2 text-gray-600">${m.via}</td>
                             <td class="py-2"><span class="bg-purple-50 text-purple-700 font-semibold px-1.5 py-0.5 rounded text-[10px]">${m.frecuencia}</span></td>
                         </tr>
-                        ${m.obs && m.obs !== '--' ? `
+                        ${m.observaciones && m.observaciones !== '--' ? `
                             <tr class="border-b border-gray-100 text-[10px] text-gray-500 bg-amber-50/30">
                                 <td colspan="4" class="pb-1.5 pt-0 px-1 italic">
-                                    <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>Obs: ${m.obs}
+                                    <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>Observaciones: ${m.observaciones}
                                 </td>
                             </tr>
                         ` : ''}
                     `).join('');
+
+                    const estadoBadgeClass = receta.estado === 'Activo' 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                        : 'bg-rose-100 text-rose-800 border-rose-200';
 
                     recetasHtml += `
                         <div class="bg-white rounded-xl border border-gray-200 p-3.5 space-y-2.5 shadow-2xs mb-3">
                             <div class="flex items-center justify-between border-b border-gray-100 pb-2">
                                 <div class="flex items-center space-x-1.5 text-xs text-forest-800 font-bold">
                                     <i class="fa-solid fa-receipt"></i>
-                                    <span>Indicación N° ${p.recetas.length - idx}</span>
+                                    <span>Receta N° ${receta.idReceta}</span>
                                 </div>
                                 <span class="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${receta.fecha}</span>
                             </div>
                             
                             <p class="text-[11px] text-gray-500">
-                                <span class="font-semibold text-gray-700">Prescriptor:</span> ${receta.medico}
+                                <span class="font-semibold text-gray-700">Médico prescriptor:</span> ${receta.medico}
                             </p>
 
-                            <!-- Tabla de psicofármacos -->
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="text-[10px] text-gray-400 uppercase border-b border-gray-100 font-semibold">
@@ -553,6 +686,19 @@
                                     ${medsRows}
                                 </tbody>
                             </table>
+
+                            <!-- PARTE INFERIOR: CAMBIO DE ESTADO (ACTIVO / VENCIDO) -->
+                            <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
+                                <span class="text-gray-500 font-medium">Estado receta:</span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${estadoBadgeClass}">
+                                        ${receta.estado}
+                                    </span>
+                                    <button onclick="toggleEstadoReceta(${p.id}, ${receta.idReceta})" class="text-[11px] text-forest-800 hover:underline font-semibold">
+                                        Cambiar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     `;
                 });
@@ -564,61 +710,45 @@
                     <div class="w-16 h-16 rounded-full ${p.avatarBg} font-bold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner border border-black/5">
                         ${p.avatar}
                     </div>
-                    <h4 class="font-bold text-gray-900 text-base">${p.nombre}</h4>
-                    <p class="text-xs font-semibold text-forest-800 bg-forest-50 inline-block px-2.5 py-0.5 rounded-full border border-forest-200 mt-1">
-                        ${p.sector} • ${p.cama}
-                    </p>
+                    <h4 class="font-bold text-gray-900 text-base">${p.nombre} ${p.apellido}</h4>
                 </div>
 
-                <!-- Detalles Clínicos e Identificación -->
+                <!-- Detalles Clínicos e Identificación del modelo Django -->
                 <div class="py-4 space-y-2.5 text-xs border-b border-gray-100">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">DNI:</span>
-                        <span class="font-mono font-semibold text-gray-800">${p.dni}</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">Edad / Nacimiento:</span>
-                        <span class="font-semibold text-gray-800">${p.edad} (${p.fechaNacimiento})</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">Cobertura Med:</span>
-                        <span class="font-medium text-gray-800">${p.obraSocial}</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">Psiquiatra Tratante:</span>
-                        <span class="font-bold text-gray-900">${p.medicoTratante}</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">Ingreso / Días:</span>
-                        <span class="font-medium text-gray-800">${p.fechaIngreso} <span class="text-emerald-700 font-bold">(${p.diasInternado} días)</span></span>
-                    </div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Nombre:</span><span class="font-semibold text-gray-800">${p.nombre}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Apellido:</span><span class="font-semibold text-gray-800">${p.apellido}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">DNI:</span><span class="font-mono font-semibold text-gray-800">${p.dni}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Fecha Nacimiento:</span><span class="font-semibold text-gray-800">${p.fechaNacimientoDisplay || p.fecha_nacimiento}</span></div>
+                    ${p.email ? `<div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Email:</span><span class="font-medium text-gray-800">${p.email}</span></div>` : ''}
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Obra Social:</span><span class="font-medium text-gray-800">${p.obra_social}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Sexo:</span><span class="font-medium text-gray-800">${p.sexo_paciente}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Teléfono:</span><span class="font-mono font-medium text-gray-800">${p.telefono}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Dirección:</span><span class="font-medium text-gray-800 truncate max-w-[180px]">${p.direccion}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-gray-500 font-medium">Estado:</span><span class="font-bold text-forest-800">${p.estado_paciente}</span></div>
 
                     <div class="pt-2 border-t border-gray-50">
-                        <span class="text-[11px] font-bold text-purple-900 uppercase tracking-wider block mb-1">Diagnóstico Psiquiátrico (CIE-10):</span>
-                        <div class="bg-purple-50/70 p-2.5 rounded-xl border border-purple-100 text-purple-950 font-medium text-xs leading-snug">
+                        <span class="text-[11px] font-bold text-gray-700 uppercase tracking-wider block mb-1">Diagnóstico:</span>
+                        <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-gray-900 font-medium text-xs leading-snug">
                             ${p.diagnostico}
+                        </div>
+                    </div>
+
+                    <!-- ESTILO SIMPLE Y COHESIVO PARA UBICACIÓN -->
+                    <div class="flex justify-between items-center pt-2 border-t border-gray-50">
+                        <span class="text-gray-500 font-medium">Ubicación Asignada:</span>
+                        <div class="flex items-center space-x-1.5 text-xs">
+                            <span class="font-bold text-forest-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">${p.sector}</span>
+                            <span class="font-mono font-bold text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded text-[11px]">Hab. ${p.habitacion} • ${p.cama}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECCIÓN RECETARIO / INDICACIONES MÉDICAS -->
+                <!-- SECCIÓN RECETARIO -->
                 <div class="pt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h4 class="font-bold text-gray-800 text-xs uppercase tracking-wider flex items-center space-x-1.5">
-                            <i class="fa-solid fa-pills text-forest-700"></i>
-                            <span>Indicación Médica Activa</span>
-                        </h4>
-                    </div>
-
-                    <!-- BOTÓN DESTACADO "+ AGREGAR NUEVA RECETA" -->
                     <button onclick="openRecetaModal(${p.id})" 
                             class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-plus text-xs"></i>
-                        <span>+ Agregar Nueva Receta / Indicación</span>
+                        <span>Agregar Receta</span>
                     </button>
 
                     <div class="mt-3">
@@ -628,8 +758,125 @@
             `;
         }
 
-        // --- FILAS DINÁMICAS EN EL MODAL DE RECETA ---
-        function addFarmacoRow(farmaco = '', dosis = '', via = 'Oral', frecuencia = 'Cada 8 hs', obs = '') {
+        // ALTERNAR ESTADO DE LA RECETA (ACTIVO / VENCIDO)
+        function toggleEstadoReceta(patientId, recetaId) {
+            const p = pacientes.find(item => item.id === patientId);
+            if (!p) return;
+            const r = p.recetas.find(rec => rec.idReceta === recetaId);
+            if (!r) return;
+
+            r.estado = r.estado === 'Activo' ? 'Vencido' : 'Activo';
+            selectPatient(patientId);
+            showToast(`Estado de la Receta N° ${recetaId} actualizado a ${r.estado}.`);
+        }
+
+        // MODAL ALTA PACIENTE
+        function openNuevoPacienteModal() {
+            document.getElementById('form-nuevo-paciente').reset();
+            document.getElementById('modal-nuevo-paciente').classList.remove('hidden');
+        }
+
+        function saveNuevoPaciente() {
+            const nombre = document.getElementById('add-nombre').value.trim();
+            const apellido = document.getElementById('add-apellido').value.trim();
+            const dni = document.getElementById('add-dni').value.trim();
+            const fechaNac = document.getElementById('add-fecha_nacimiento').value;
+
+            if (!nombre || !apellido || !dni || !fechaNac) {
+                alert('Por favor complete los campos obligatorios (*).');
+                return;
+            }
+
+            const parts = fechaNac.split('-');
+            const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : fechaNac;
+
+            const newPatient = {
+                id: Date.now(),
+                nombre: nombre,
+                apellido: apellido,
+                dni: dni,
+                fecha_nacimiento: fechaNac,
+                fechaNacimientoDisplay: displayDate,
+                email: document.getElementById('add-email').value.trim(),
+                obra_social: document.getElementById('add-obra_social').value.trim(),
+                sexo_paciente: document.getElementById('add-sexo_paciente').value,
+                telefono: document.getElementById('add-telefono').value.trim(),
+                direccion: document.getElementById('add-direccion').value.trim(),
+                estado_paciente: document.getElementById('add-estado_paciente').value,
+                estadoBadge: document.getElementById('add-estado_paciente').value === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200",
+                diagnostico: document.getElementById('add-diagnostico').value.trim(),
+                sector: document.getElementById('add-sector').value,
+                habitacion: document.getElementById('add-habitacion').value,
+                cama: document.getElementById('add-cama').value.trim(),
+                avatar: (nombre[0] || '') + (apellido[0] || ''),
+                avatarBg: "bg-emerald-100 text-emerald-800",
+                recetas: []
+            };
+
+            pacientes.unshift(newPatient);
+            closeModal('modal-nuevo-paciente');
+            selectPatient(newPatient.id);
+            showToast(`Nuevo paciente ${nombre} ${apellido} registrado con éxito.`);
+        }
+
+        // MODAL EDICIÓN PACIENTE
+        function openEditModal(patientId) {
+            const p = pacientes.find(item => item.id === patientId);
+            if (!p) return;
+
+            document.getElementById('edit-patient-id').value = p.id;
+            document.getElementById('edit-nombre').value = p.nombre;
+            document.getElementById('edit-apellido').value = p.apellido;
+            document.getElementById('edit-dni').value = p.dni;
+            document.getElementById('edit-fecha_nacimiento').value = p.fecha_nacimiento;
+            document.getElementById('edit-email').value = p.email || '';
+            document.getElementById('edit-obra_social').value = p.obra_social;
+            document.getElementById('edit-sexo_paciente').value = p.sexo_paciente;
+            document.getElementById('edit-telefono').value = p.telefono;
+            document.getElementById('edit-direccion').value = p.direccion;
+            document.getElementById('edit-estado_paciente').value = p.estado_paciente;
+            document.getElementById('edit-sector').value = p.sector;
+            document.getElementById('edit-habitacion').value = p.habitacion;
+            document.getElementById('edit-cama').value = p.cama;
+            document.getElementById('edit-diagnostico').value = p.diagnostico;
+
+            document.getElementById('modal-editar-paciente').classList.remove('hidden');
+        }
+
+        function savePatientEdit() {
+            const id = parseInt(document.getElementById('edit-patient-id').value);
+            const p = pacientes.find(item => item.id === id);
+            if (!p) return;
+
+            p.nombre = document.getElementById('edit-nombre').value.trim();
+            p.apellido = document.getElementById('edit-apellido').value.trim();
+            p.dni = document.getElementById('edit-dni').value.trim();
+            p.fecha_nacimiento = document.getElementById('edit-fecha_nacimiento').value;
+            
+            const parts = p.fecha_nacimiento.split('-');
+            if (parts.length === 3) p.fechaNacimientoDisplay = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+            p.email = document.getElementById('edit-email').value.trim();
+            p.obra_social = document.getElementById('edit-obra_social').value.trim();
+            p.sexo_paciente = document.getElementById('edit-sexo_paciente').value;
+            p.telefono = document.getElementById('edit-telefono').value.trim();
+            p.direccion = document.getElementById('edit-direccion').value.trim();
+            p.estado_paciente = document.getElementById('edit-estado_paciente').value;
+            p.sector = document.getElementById('edit-sector').value;
+            p.habitacion = document.getElementById('edit-habitacion').value;
+            p.cama = document.getElementById('edit-cama').value.trim();
+            p.diagnostico = document.getElementById('edit-diagnostico').value.trim();
+
+            p.avatar = (p.nombre[0] || '') + (p.apellido[0] || '');
+            p.estadoBadge = p.estado_paciente === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200";
+
+            closeModal('modal-editar-paciente');
+            selectPatient(id);
+            showToast(`Ficha clínica de ${p.nombre} ${p.apellido} actualizada.`);
+        }
+
+        // FILAS DINÁMICAS Y MODAL RECETA
+        function addFarmacoRow(farmaco = '', dosis = '', via = 'Oral', frecuencia = 'Cada 8 hs', observaciones = '') {
             const container = document.getElementById('farmacos-container');
             const rowId = Date.now() + Math.random().toString(36).substring(2, 5);
 
@@ -643,12 +890,12 @@
                 </button>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-6">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Psicofármaco *</label>
-                        <input type="text" placeholder="Ej: Haloperidol / Clonazepam" value="${farmaco}" class="farmaco-name w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Fármaco *</label>
+                        <input type="text" placeholder="Ej: Paracetamol" value="${farmaco}" class="farmaco-name w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase">Dosis *</label>
-                        <input type="text" placeholder="Ej: 5 mg / 20 mg" value="${dosis}" class="farmaco-dosis w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                        <input type="text" placeholder="Ej: 500 mg" value="${dosis}" class="farmaco-dosis w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -657,27 +904,22 @@
                         <select class="farmaco-via w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
                             <option value="Oral" ${via === 'Oral' ? 'selected' : ''}>Oral</option>
                             <option value="Sublingual" ${via === 'Sublingual' ? 'selected' : ''}>Sublingual</option>
-                            <option value="Intramuscular" ${via === 'Intramuscular' ? 'selected' : ''}>Intramuscular (IM)</option>
-                            <option value="Endovenosa" ${via === 'Endovenosa' ? 'selected' : ''}>Endovenosa (EV)</option>
+                            <option value="Intramuscular" ${via === 'Intramuscular' ? 'selected' : ''}>Intramuscular</option>
+                            <option value="Endovenosa" ${via === 'Endovenosa' ? 'selected' : ''}>Endovenosa</option>
+                            <option value="Subcutánea" ${via === 'Subcutánea' ? 'selected' : ''}>Subcutánea</option>
+                            <option value="Tópica" ${via === 'Tópica' ? 'selected' : ''}>Tópica</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase">Frecuencia *</label>
-                        <select class="farmaco-frecuencia w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                            <option value="Cada 8 hs" ${frecuencia === 'Cada 8 hs' ? 'selected' : ''}>Cada 8 hs</option>
-                            <option value="Cada 12 hs" ${frecuencia === 'Cada 12 hs' ? 'selected' : ''}>Cada 12 hs</option>
-                            <option value="Cada 24 hs" ${frecuencia === 'Cada 24 hs' ? 'selected' : ''}>Cada 24 hs</option>
-                            <option value="Al acostarse" ${frecuencia === 'Al acostarse' ? 'selected' : ''}>Al acostarse</option>
-                            <option value="SOS / Requerimiento" ${frecuencia === 'SOS / Requerimiento' ? 'selected' : ''}>SOS / Requerimiento</option>
-                        </select>
+                        <input type="text" placeholder="Ej: Cada 8 hs" value="${frecuencia}" class="farmaco-frecuencia w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
                     </div>
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Criterio / Obs</label>
-                        <input type="text" placeholder="Ej: En caso de agitación" value="${obs}" class="farmaco-obs w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-forest-800 focus:outline-none">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Observaciones</label>
+                        <input type="text" placeholder="Observaciones" value="${observaciones}" class="farmaco-obs w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
                     </div>
                 </div>
             `;
-
             container.appendChild(row);
         }
 
@@ -686,28 +928,24 @@
             if (row) row.remove();
         }
 
-        // ABRIR MODAL RECETA
         function openRecetaModal(patientId) {
             const p = pacientes.find(item => item.id === patientId);
             if (!p) return;
 
             selectedPatientId = patientId;
-            document.getElementById('receta-modal-paciente').innerText = `${p.nombre} (DNI: ${p.dni})`;
-            document.getElementById('receta-modal-cama').innerText = `${p.sector} - ${p.cama}`;
+            document.getElementById('receta-modal-paciente').innerText = `${p.nombre} ${p.apellido} (DNI: ${p.dni})`;
             
-            // Limpiar contenedor de fármacos e insertar uno por defecto
             document.getElementById('farmacos-container').innerHTML = '';
-            addFarmacoRow('Quetiapina', '100 mg', 'Oral', 'Al acostarse', 'Monitorear respuesta');
-
+            addFarmacoRow('Paracetamol', '500 mg', 'Oral', 'Cada 8 hs', 'Sin observaciones');
             document.getElementById('modal-receta').classList.remove('hidden');
         }
 
-        // GUARDAR NUEVA RECETA Y ACTUALIZAR VISTA EN TIEMPO REAL
         function saveReceta() {
             const p = pacientes.find(item => item.id === selectedPatientId);
             if (!p) return;
 
-            const medico = document.getElementById('receta-medico').value;
+            const nroReceta = parseInt(document.getElementById('receta-numero').value) || Math.floor(Math.random() * 9000);
+            const medico = document.getElementById('receta-medico').value.trim() || "Dr. Desconocido";
             const fechaRaw = document.getElementById('receta-fecha').value;
             let fechaFormatted = "14/08/2026";
             if (fechaRaw) {
@@ -715,7 +953,6 @@
                 if(parts.length === 3) fechaFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
 
-            // Recolectar fármacos ingresados
             const farmacoRows = document.querySelectorAll('#farmacos-container > div');
             const medicaciones = [];
 
@@ -723,81 +960,32 @@
                 const name = row.querySelector('.farmaco-name').value.trim();
                 const dosis = row.querySelector('.farmaco-dosis').value.trim();
                 const via = row.querySelector('.farmaco-via').value;
-                const frecuencia = row.querySelector('.farmaco-frecuencia').value;
-                const obs = row.querySelector('.farmaco-obs').value.trim();
+                const frecuencia = row.querySelector('.farmaco-frecuencia').value.trim();
+                const observaciones = row.querySelector('.farmaco-obs').value.trim();
 
                 if (name && dosis) {
-                    medicaciones.push({
-                        farmaco: name,
-                        dosis: dosis,
-                        via: via,
-                        frecuencia: frecuencia,
-                        obs: obs || '--'
-                    });
+                    medicaciones.push({ farmaco: name, dosis: dosis, via: via, frecuencia: frecuencia, observaciones: observaciones || '--' });
                 }
             });
 
             if (medicaciones.length === 0) {
-                alert('Debe ingresar al menos un psicofármaco con su dosis.');
+                alert('Debe ingresar al menos un fármaco.');
                 return;
             }
 
-            // Agregar la nueva receta al inicio del historial del paciente
             p.recetas.unshift({
-                id: Date.now(),
+                idReceta: nroReceta,
                 fecha: fechaFormatted,
                 medico: medico,
+                estado: "Activo",
                 medicaciones: medicaciones
             });
 
             closeModal('modal-receta');
             selectPatient(p.id);
-            showToast(`Nueva receta psiquiátrica guardada para ${p.nombre}.`);
+            showToast(`Receta N° ${nroReceta} guardada correctamente.`);
         }
 
-        // MODAL DE EDICIÓN DE PACIENTE
-        function openEditModal(patientId) {
-            const p = pacientes.find(item => item.id === patientId);
-            if (!p) return;
-
-            document.getElementById('edit-patient-id').value = p.id;
-            document.getElementById('edit-nombre').value = p.nombre;
-            document.getElementById('edit-sector').value = p.sector;
-            document.getElementById('edit-cama').value = p.cama;
-            document.getElementById('edit-diagnostico').value = p.diagnostico;
-            document.getElementById('edit-estado').value = p.estado;
-
-            document.getElementById('modal-editar-paciente').classList.remove('hidden');
-        }
-
-        function savePatientEdit() {
-            const id = parseInt(document.getElementById('edit-patient-id').value);
-            const p = pacientes.find(item => item.id === id);
-            if (!p) return;
-
-            p.nombre = document.getElementById('edit-nombre').value;
-            p.sector = document.getElementById('edit-sector').value;
-            p.cama = document.getElementById('edit-cama').value;
-            p.diagnostico = document.getElementById('edit-diagnostico').value;
-            p.estado = document.getElementById('edit-estado').value;
-
-            // Actualizar estilo del badge según el estado
-            if (p.estado.includes('Aislamiento')) {
-                p.estadoBadge = "bg-rose-100 text-rose-800 border-rose-200";
-            } else if (p.estado.includes('Alta')) {
-                p.estadoBadge = "bg-blue-100 text-blue-800 border-blue-200";
-            } else if (p.estado.includes('Fuga')) {
-                p.estadoBadge = "bg-amber-100 text-amber-800 border-amber-200";
-            } else {
-                p.estadoBadge = "bg-emerald-100 text-emerald-800 border-emerald-200";
-            }
-
-            closeModal('modal-editar-paciente');
-            selectPatient(id);
-            showToast(`Datos del paciente ${p.nombre} actualizados.`);
-        }
-
-        // BUSCADOR EN TIEMPO REAL
         function filterPacientes() {
             const query = document.getElementById('search-patient').value.toLowerCase();
             const container = document.getElementById('pacientes-container');
@@ -805,10 +993,10 @@
 
             const filtered = pacientes.filter(p => 
                 p.nombre.toLowerCase().includes(query) ||
+                p.apellido.toLowerCase().includes(query) ||
                 p.dni.toLowerCase().includes(query) ||
                 p.cama.toLowerCase().includes(query) ||
-                p.sector.toLowerCase().includes(query) ||
-                p.diagnostico.toLowerCase().includes(query)
+                p.sector.toLowerCase().includes(query)
             );
 
             if (filtered.length === 0) {
@@ -823,7 +1011,7 @@
             filtered.forEach(p => {
                 const isSelected = p.id === selectedPatientId;
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
                     isSelected ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' : 'bg-white border-gray-200/80'
                 }`;
 
@@ -837,21 +1025,18 @@
                             ${p.avatar}
                         </div>
                         <div class="min-w-0">
-                            <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre}</h4>
-                            <p class="text-xs text-forest-800 font-semibold">${p.sector} - ${p.cama}</p>
-                            <p class="text-xs text-gray-500 italic truncate">${p.diagnostico}</p>
+                            <h4 class="font-bold text-gray-900 text-sm truncate">${p.nombre} ${p.apellido}</h4>
+                            <p class="text-xs text-gray-500">DNI: ${p.dni}</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="openEditModal(${p.id})" class="p-2 text-gray-500 hover:text-forest-800 border rounded-lg"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
-                        <button onclick="openRecetaModal(${p.id})" class="px-3 py-1.5 bg-forest-800 text-white font-semibold text-xs rounded-lg">+ Receta</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // UTILIDADES
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
@@ -859,10 +1044,8 @@
         function showToast(message) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = message;
-            
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
