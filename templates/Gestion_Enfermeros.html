@@ -1,427 +1,415 @@
 {% extends 'layouts/sidebarBase.html' %}
 
 {% block contenido %}
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        <!-- Top Navigation Header -->
-        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
-            <div class="relative w-full max-w-lg">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                </span>
-                <input type="text" id="search-input" onkeyup="filterEnfermeros()"
-                       placeholder="Buscar enfermero por nombre, matrícula o DNI..." 
-                       class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-6">
-                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                    <i class="fa-regular fa-bell text-lg"></i>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-                </button>
-                <div class="text-right border-l border-gray-200 pl-6">
-                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</p>
-                    <p class="text-sm font-bold text-gray-800">Panel de Jefatura</p>
-                </div>
-            </div>
-        </header>
-
-        <!-- Área de Contenido Scrollable -->
-        <main class="flex-1 overflow-y-auto p-8">
-            <div class="max-w-7xl mx-auto space-y-6">
-
-                <!-- HEADER SECCIÓN -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Gestión de Personal de Enfermería</h2>
-                        <p class="text-xs text-gray-500 mt-1">Aprobación de cuentas pendientes, supervisión SISA y control de servicios.</p>
-                    </div>
-                </div>
-
-                <!-- CONTENEDOR PRINCIPAL: GRILLA Y VISTA PREVIA -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    <!-- COLUMNA IZQUIERDA: LISTADO -->
-                    <div class="lg:col-span-2 space-y-4">
-                        <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
-                            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                                <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
-                                    <i class="fa-solid fa-list-check text-forest-800"></i>
-                                    <span>Nómina y Solicitudes de Acceso</span>
-                                </h3>
-                                <span class="text-xs text-gray-400 font-medium">Total: <span id="badge-count">0</span></span>
-                            </div>
-
-                            <div id="enfermeros-container" class="mt-4 space-y-3">
-                                <!-- Renderizado dinámico por JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- COLUMNA DERECHA: FICHA RÁPIDA -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4">
-                            <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider flex items-center space-x-2">
-                                    <i class="fa-solid fa-id-card-clip text-emerald-700"></i>
-                                    <span>Perfil del Profesional</span>
-                                </h3>
-                                <span class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Activo</span>
-                            </div>
-
-                            <div id="quick-preview-panel">
-                                <p class="text-xs text-gray-400 text-center py-8">Seleccione un enfermero para ver sus detalles.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- ================= MODAL 1: CONSULTA SISA ================= -->
-    <div id="modal-sisa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-            <div class="bg-gradient-to-r from-sky-800 to-sky-700 text-white p-5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/20">
-                        <i class="fa-solid fa-shield-halved text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base leading-tight">Consulta en Registro SISA</h4>
-                        <p class="text-xs text-sky-100">Sistema de Información Sanitaria Argentino</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('modal-sisa')" class="text-white/80 hover:text-white p-1.5 rounded-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs">
-                <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 flex items-start space-x-3">
-                    <i class="fa-solid fa-circle-check text-sky-800 text-lg mt-0.5"></i>
-                    <div>
-                        <p class="font-semibold text-sky-900">Validación oficial completada</p>
-                        <p class="text-sky-700 mt-0.5">Matrícula cotejada con la Red Federal de Registros de Profesionales de la Salud.</p>
-                    </div>
-                </div>
-
-                <div class="space-y-3 divide-y divide-gray-100">
-                    <div class="flex justify-between items-center pt-1">
-                        <span class="text-gray-500 font-medium">Profesional:</span>
-                        <span id="sisa-nombre" class="font-bold text-gray-800 text-sm">--</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-gray-500 font-medium">N° Matrícula:</span>
-                        <span id="sisa-matricula" class="font-mono font-bold text-sky-900 text-sm bg-sky-50 px-2 py-0.5 rounded">--</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-gray-500 font-medium">Estado Matrícula:</span>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">VIGENTE</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="text-gray-500 font-medium">Especialidad:</span>
-                        <span id="sisa-especialidad" class="font-semibold text-gray-800">--</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-                <button onclick="closeModal('modal-sisa')" class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Cerrar</button>
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+        <div class="relative w-full max-w-lg">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </span>
+            <input type="text" id="search-input" onkeyup="filterEnfermeros()"
+                placeholder="Buscar enfermero por nombre, matrícula o DNI..."
+                class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <kbd
+                    class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘
+                    K</kbd>
             </div>
         </div>
-    </div>
 
-    <!-- ================= MODAL 2: BAJA LÓGICA (MANTENIENDO HISTORIAL) ================= -->
-    <div id="modal-baja" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-            <div class="bg-rose-600 text-white p-5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
-                        <i class="fa-solid fa-user-minus text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base leading-tight">Desvincular del Servicio</h4>
-                        <p class="text-xs text-rose-100">Baja administrativa con resguardo histórico</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('modal-baja')" class="text-white/80 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
-                    <div class="flex items-start space-x-3">
-                        <i class="fa-solid fa-shield-cat text-amber-600 text-lg mt-0.5"></i>
-                        <div>
-                            <p class="text-xs font-bold text-amber-900 uppercase">Inalterabilidad de registros médicos</p>
-                            <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                                La baja de <span id="baja-nombre" class="font-bold text-gray-900">--</span> impedirá su acceso al sistema, pero <strong>todos sus registros de suministro de medicamentos e historiales permanecerán guardados</strong> por normativas de auditoría médica.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-3 pt-2 text-xs">
-                    <label class="block font-bold text-gray-700">Motivo de la desvinculación:</label>
-                    <select id="motivo-baja" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
-                        <option value="Reasignación">Reasignación a otro centro</option>
-                        <option value="Licencia Prolongada">Licencia prolongada</option>
-                        <option value="Fin de Contrato">Fin de contrato / Retiro</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-                <button onclick="closeModal('modal-baja')" class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Cancelar</button>
-                <button onclick="confirmarBaja()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl flex items-center space-x-2">
-                    <i class="fa-solid fa-check"></i>
-                    <span>Confirmar Baja Conservando Registros</span>
-                </button>
+        <div class="flex items-center space-x-6">
+            <button
+                class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                <i class="fa-regular fa-bell text-lg"></i>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+            </button>
+            <div class="text-right border-l border-gray-200 pl-6">
+                <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</p>
+                <p class="text-sm font-bold text-gray-800">Panel de Jefatura</p>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- TOAST -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toast-msg">Acción realizada con éxito</span>
-    </div>
+    <!-- Área de Contenido Scrollable -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
 
-    <!-- SCRIPT DE GESTIÓN -->
-    <script>
-        // Datos de ejemplo incluyendo enfermeros verificados y pendientes de aprobación
-        let enfermeros = [
-            {
-                id: 1,
-                nombre: "Sofía Medina",
-                dni: "34.892.102",
-                matricula: "SM-2841",
-                email: "s.medina@hospitalpereyra.gob.ar",
-                telefono: "+54 261 459-2011",
-                puesto: "Licenciada en Enfermería",
-                servicioHospital: "Sector Mujeres",
-                verificado: true, // Cuenta habilitada
-                sisa: { especialidad: "Cuidados Críticos y Salud Mental" },
-                avatar: "SM",
-                avatarBg: "bg-emerald-100 text-emerald-800"
-            },
-            {
-                id: 1,
-                nombre: "Sofía Medina",
-                dni: "34.892.102",
-                matricula: "SM-2841",
-                email: "s.medina@hospitalpereyra.gob.ar",
-                telefono: "+54 261 459-2011",
-                puesto: "Licenciada en Enfermería",
-                servicioHospital: "Sector Mujeres",
-                verificado: true, // Cuenta habilitada
-                sisa: { especialidad: "Cuidados Críticos y Salud Mental" },
-                avatar: "SM",
-                avatarBg: "bg-emerald-100 text-emerald-800"
-            },
-            {
-                id: 1,
-                nombre: "Sofía Medina",
-                dni: "34.892.102",
-                matricula: "SM-2841",
-                email: "s.medina@hospitalpereyra.gob.ar",
-                telefono: "+54 261 459-2011",
-                puesto: "Licenciada en Enfermería",
-                servicioHospital: "Sector Mujeres",
-                verificado: true, // Cuenta habilitada
-                sisa: { especialidad: "Cuidados Críticos y Salud Mental" },
-                avatar: "SM",
-                avatarBg: "bg-emerald-100 text-emerald-800"
-            },
-            {
-                id: 2,
-                nombre: "Lucas Giménez",
-                dni: "39.102.445",
-                matricula: "LG-4920",
-                email: "l.gimenez@hospitalpereyra.gob.ar",
-                telefono: "+54 261 555-8811",
-                puesto: "Enfermero Profesional",
-                servicioHospital: "Guardia / Admisión",
-                verificado: false, // PENDIENTE DE APROBACIÓN POR EL JEFE
-                sisa: { especialidad: "Enfermería General" },
-                avatar: "LG",
-                avatarBg: "bg-amber-100 text-amber-800"
-            }
-        ];
-
-        let selectedEnfermeroId = 1;
-        let enfermeroABajar = null;
-
-        window.onload = function() {
-            renderList();
-            selectEnfermero(1);
-        };
-
-        function renderList() {
-            const container = document.getElementById('enfermeros-container');
-            container.innerHTML = '';
-            document.getElementById('badge-count').innerText = enfermeros.length;
-
-            enfermeros.forEach(enf => {
-                const isSelected = enf.id === selectedEnfermeroId;
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                    isSelected ? 'bg-emerald-50/50 border-emerald-500/80 shadow-xs' : 'bg-white border-gray-200/80 hover:bg-gray-50/50'
-                }`;
-
-                card.onclick = (e) => {
-                    if (!e.target.closest('button')) selectEnfermero(enf.id);
-                };
-
-                // Identificar estado de aprobación
-                let badgeEstado = enf.verificado 
-                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Habilitado</span>`
-                    : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 animate-pulse">Pendiente de Aprobación</span>`;
-
-                // Botón dinámico: Si no está verificado muestra "Aprobar", sino los de control
-                let botonesAccion = '';
-                if (!enf.verificado) {
-                    botonesAccion = `
-                        <button onclick="aprobarEnfermero(${enf.id})" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
-                            <i class="fa-solid fa-user-check text-xs"></i>
-                            <span>Aprobar Cuenta</span>
-                        </button>
-                    `;
-                } else {
-                    botonesAccion = `
-                        <button onclick="openSISAModal(${enf.id})" class="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-800 font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5">
-                            <i class="fa-solid fa-shield-halved text-xs"></i>
-                            <span>SISA</span>
-                        </button>
-                        <button onclick="openBajaModal(${enf.id})" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1">
-                            <i class="fa-solid fa-user-minus text-xs"></i>
-                            <span>Baja</span>
-                        </button>
-                    `;
-                }
-
-                card.innerHTML = `
-                    <div class="flex items-center space-x-3.5 min-w-0">
-                        <div class="w-11 h-11 rounded-full ${enf.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0">
-                            ${enf.avatar}
-                        </div>
-                        <div class="min-w-0">
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-bold text-gray-900 text-sm truncate">${enf.nombre}</h4>
-                                ${badgeEstado}
-                            </div>
-                            <p class="text-xs text-gray-500 font-medium">${enf.puesto} • <span class="text-forest-800">${enf.servicioHospital}</span></p>
-                            <span class="font-mono bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[10px] font-bold mt-1 inline-block">Mat: ${enf.matricula}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2 pt-2 md:pt-0 justify-end">
-                        ${botonesAccion}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function aprobarEnfermero(id) {
-            const enf = enfermeros.find(e => e.id === id);
-            if (enf) {
-                enf.verificado = true;
-                renderList();
-                selectEnfermero(id);
-                showToast(`Cuenta de ${enf.nombre} aprobada con éxito. Ya puede iniciar sesión.`);
-            }
-        }
-
-        function selectEnfermero(id) {
-            selectedEnfermeroId = id;
-            renderList();
-            const enf = enfermeros.find(e => e.id === id);
-            const panel = document.getElementById('quick-preview-panel');
-            if (!enf) return;
-
-            panel.innerHTML = `
-                <div class="text-center pb-4 border-b border-gray-100">
-                    <div class="w-16 h-16 rounded-full ${enf.avatarBg} font-bold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner">
-                        ${enf.avatar}
-                    </div>
-                    <h4 class="font-bold text-gray-900 text-base">${enf.nombre}</h4>
-                    <p class="text-xs font-semibold text-emerald-800 bg-emerald-50 inline-block px-2.5 py-0.5 rounded-full border border-emerald-200 mt-1">
-                        ${enf.puesto}
-                    </p>
+            <!-- HEADER SECCIÓN -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Gestión de Personal de Enfermería</h2>
+                    <p class="text-xs text-gray-500 mt-1">Aprobación de cuentas pendientes, supervisión SISA y control
+                        de servicios.</p>
                 </div>
-                <div class="py-4 space-y-3.5 text-xs">
-                    <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                        <span class="text-gray-500 font-medium">Servicio:</span>
-                        <span class="font-bold text-gray-800">${enf.servicioHospital}</span>
+            </div>
+
+            <!-- CONTENEDOR PRINCIPAL: GRILLA Y VISTA PREVIA -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- COLUMNA IZQUIERDA: LISTADO -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                            <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-forest-800"></i>
+                                <span>Nómina y Solicitudes de Acceso</span>
+                            </h3>
+                            <span class="text-xs text-gray-400 font-medium">Total: <span
+                                    id="badge-count">0</span></span>
+                        </div>
+
+                        <div id="enfermeros-container" class="mt-4 space-y-3">
+                            <!-- Renderizado dinámico por JS -->
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                        <span class="text-gray-500 font-medium">DNI:</span>
-                        <span class="font-mono font-semibold text-gray-800">${enf.dni}</span>
+                </div>
+
+                <!-- COLUMNA DERECHA: FICHA RÁPIDA -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+                            <h3
+                                class="font-bold text-gray-800 text-sm uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-id-card-clip text-emerald-700"></i>
+                                <span>Perfil del Profesional</span>
+                            </h3>
+                            <span
+                                class="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Activo</span>
+                        </div>
+
+                        <div id="quick-preview-panel">
+                            <p class="text-xs text-gray-400 text-center py-8">Seleccione un enfermero para ver sus
+                                detalles.</p>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center border-b border-gray-50 pb-2">
-                        <span class="text-gray-500 font-medium">Matrícula:</span>
-                        <span class="font-mono font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">${enf.matricula}</span>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ================= MODAL 1: CONSULTA SISA ================= -->
+<div id="modal-sisa"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+        <div class="bg-gradient-to-r from-sky-800 to-sky-700 text-white p-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white border border-white/20">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-base leading-tight">Consulta en Registro SISA</h4>
+                    <p class="text-xs text-sky-100">Sistema de Información Sanitaria Argentino</p>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-sisa')" class="text-white/80 hover:text-white p-1.5 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4 text-xs">
+            <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 flex items-start space-x-3">
+                <i class="fa-solid fa-circle-check text-sky-800 text-lg mt-0.5"></i>
+                <div>
+                    <p class="font-semibold text-sky-900">Validación oficial completada</p>
+                    <p class="text-sky-700 mt-0.5">Matrícula cotejada con la Red Federal de Registros de Profesionales
+                        de la Salud.</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 divide-y divide-gray-100">
+                <div class="flex justify-between items-center pt-1">
+                    <span class="text-gray-500 font-medium">Profesional:</span>
+                    <span id="sisa-nombre" class="font-bold text-gray-800 text-sm">--</span>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-gray-500 font-medium">N° Matrícula:</span>
+                    <span id="sisa-matricula"
+                        class="font-mono font-bold text-sky-900 text-sm bg-sky-50 px-2 py-0.5 rounded">--</span>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-gray-500 font-medium">Estado Matrícula:</span>
+                    <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">VIGENTE</span>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-gray-500 font-medium">Especialidad:</span>
+                    <span id="sisa-especialidad" class="font-semibold text-gray-800">--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+            <button onclick="closeModal('modal-sisa')"
+                class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL 2: BAJA LÓGICA (MANTENIENDO HISTORIAL) ================= -->
+<div id="modal-baja"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+        <div class="bg-rose-600 text-white p-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-user-minus text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-base leading-tight">Desvincular del Servicio</h4>
+                    <p class="text-xs text-rose-100">Baja administrativa con resguardo histórico</p>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-baja')" class="text-white/80 hover:text-white p-1 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                <div class="flex items-start space-x-3">
+                    <i class="fa-solid fa-shield-cat text-amber-600 text-lg mt-0.5"></i>
+                    <div>
+                        <p class="text-xs font-bold text-amber-900 uppercase">Inalterabilidad de registros médicos</p>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                            La baja de <span id="baja-nombre" class="font-bold text-gray-900">--</span> impedirá su
+                            acceso al sistema, pero <strong>todos sus registros de suministro de medicamentos e
+                                historiales permanecerán guardados</strong> por normativas de auditoría médica.
+                        </p>
                     </div>
-                    <div class="flex justify-between items-start border-b border-gray-50 pb-2">
-                        <span class="text-gray-500 font-medium">Correo:</span>
-                        <span class="font-medium text-gray-800 text-right break-all pl-2">${enf.email}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-500 font-medium">Teléfono:</span>
-                        <span class="font-semibold text-gray-800">${enf.telefono}</span>
+                </div>
+            </div>
+
+            <div class="space-y-3 pt-2 text-xs">
+                <label class="block font-bold text-gray-700">Motivo de la desvinculación:</label>
+                <select id="motivo-baja"
+                    class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                    <option value="Reasignación">Reasignación a otro centro</option>
+                    <option value="Licencia Prolongada">Licencia prolongada</option>
+                    <option value="Fin de Contrato">Fin de contrato / Retiro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+            <button onclick="closeModal('modal-baja')"
+                class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl">Cancelar</button>
+            <button onclick="confirmarBaja()"
+                class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl flex items-center space-x-2">
+                <i class="fa-solid fa-check"></i>
+                <span>Confirmar Baja Conservando Registros</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"
+    class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <span id="toast-msg">Acción realizada con éxito</span>
+</div>
+
+<!-- SCRIPT DE GESTIÓN -->
+<!-- Django serializará esto de forma segura y limpia automáticamente -->
+{{ enfermeros_list|json_script:"enfermeros-data" }}
+
+<script>
+    // Ahora sí, JSON.parse recibirá un array de objetos real de JavaScript
+    let enfermeros = JSON.parse(document.getElementById('enfermeros-data').textContent);
+    let enfermerosFiltrados = [...enfermeros];
+    let selectedEnfermeroId = enfermeros.length > 0 ? enfermeros.length > 0 ? enfermeros[0].id : null : null;
+    let enfermeroABajar = null;
+
+    window.onload = function () {
+        renderList();
+        if (selectedEnfermeroId) {
+            selectEnfermero(selectedEnfermeroId);
+        }
+    };
+
+    function renderList() {
+        const container = document.getElementById('enfermeros-container');
+        container.innerHTML = '';
+
+        // FILTRAR: Contar solo los enfermeros que NO están verificados (pendientes)
+        const pendientesCount = enfermerosFiltrados.filter(e => !e.verificado).length;
+        document.getElementById('badge-count').innerText = pendientesCount;
+
+        // MENSAJE CUANDO NO HAY DATOS O NO SE TIENEN PERMISOS
+        if (!enfermerosFiltrados || enfermerosFiltrados.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200 space-y-3">
+                    <i class="fa-solid fa-user-shield text-3xl text-gray-300"></i>
+                    <div>
+                        <p class="text-xs text-gray-600 font-bold">No hay enfermeros disponibles para mostrar.</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Es posible que no existan registros en este servicio o que no cuente con los permisos de Jefe de Enfermeros requeridos.</p>
                     </div>
                 </div>
             `;
+            document.getElementById('quick-preview-panel').innerHTML = `
+                <p class="text-xs text-gray-400 text-center py-8">Sin enfermero seleccionado.</p>
+            `;
+            return;
         }
 
-        function openSISAModal(id) {
-            const enf = enfermeros.find(e => e.id === id);
-            if (!enf) return;
-            document.getElementById('sisa-nombre').innerText = enf.nombre;
-            document.getElementById('sisa-matricula').innerText = enf.matricula;
-            document.getElementById('sisa-especialidad').innerText = enf.sisa.especialidad;
-            document.getElementById('modal-sisa').classList.remove('hidden');
-        }
+        enfermerosFiltrados.forEach(enf => {
+            const isSelected = enf.id === selectedEnfermeroId;
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSelected ? 'bg-emerald-50/50 border-emerald-500/80 shadow-xs ring-1 ring-emerald-500/30' : 'bg-white border-gray-200/80 hover:bg-gray-50/50'
+                }`;
 
-        function openBajaModal(id) {
-            enfermeroABajar = enfermeros.find(e => e.id === id);
-            if (!enfermeroABajar) return;
-            document.getElementById('baja-nombre').innerText = enfermeroABajar.nombre;
-            document.getElementById('modal-baja').classList.remove('hidden');
-        }
+            card.onclick = (e) => {
+                if (!e.target.closest('button')) selectEnfermero(enf.id);
+            };
 
-        function confirmarBaja() {
-            if (!enfermeroABajar) return;
-            const nombre = enfermeroABajar.nombre;
-            // Aquí en backend harías un POST para cambiar activo=False en lugar de borrar
-            enfermeros = enfermeros.filter(e => e.id !== enfermeroABajar.id);
-            closeModal('modal-baja');
-            if (enfermeros.length > 0) selectEnfermero(enfermeros[0].id);
-            showToast(`Se dio de baja lógica a ${nombre}. Los registros históricos se preservan.`);
-        }
+            let badgeEstado = enf.verificado
+                ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Habilitado</span>`
+                : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 animate-pulse">Pendiente de Aprobación</span>`;
 
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+            let botonesAccion = '';
+            if (!enf.verificado) {
+                botonesAccion = `
+                    <button onclick="aprobarEnfermero(${enf.id})" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
+                        <i class="fa-solid fa-user-check text-xs"></i>
+                        <span>Aprobar Cuenta</span>
+                    </button>
+                `;
+            } else {
+                botonesAccion = `
+                    <button onclick="openSISAModal(${enf.id})" class="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-800 font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5">
+                        <i class="fa-solid fa-shield-halved text-xs"></i>
+                        <span>SISA</span>
+                    </button>
+                    <button onclick="openBajaModal(${enf.id})" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1">
+                        <i class="fa-solid fa-user-minus text-xs"></i>
+                        <span>Baja</span>
+                    </button>
+                `;
+            }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3500);
-        }
+            card.innerHTML = `
+                <div class="flex items-center space-x-3.5 min-w-0">
+                    <div class="w-11 h-11 rounded-full ${enf.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0">
+                        ${enf.avatar}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <h4 class="font-bold text-gray-900 text-sm truncate">${enf.nombre}</h4>
+                            ${badgeEstado}
+                        </div>
+                        <p class="text-xs text-gray-500 font-medium">${enf.puesto} • <span class="text-forest-800 font-semibold">${enf.servicioHospital}</span></p>
+                        <div class="flex items-center space-x-2 text-[10px] text-gray-500 mt-1">
+                            <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded font-bold">Mat: ${enf.matricula}</span>
+                            <span>•</span>
+                            <span class="font-mono">DNI: ${enf.dni}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 pt-2 md:pt-0 justify-end">
+                    ${botonesAccion}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
 
-        function filterEnfermeros() {
-            // Lógica de filtrado en vivo de búsqueda
+    // BUSCADOR EN TIEMPO REAL POR NOMBRE, DNI O MATRÍCULA
+    function filterEnfermeros() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        if (query === '') {
+            enfermerosFiltrados = [...enfermeros];
+        } else {
+            enfermerosFiltrados = enfermeros.filter(e =>
+                e.nombre.toLowerCase().includes(query) ||
+                e.matricula.toLowerCase().includes(query) ||
+                e.dni.includes(query)
+            );
         }
-    </script>
+        renderList();
+    }
+
+    // APROBAR / VERIFICAR CUENTA EN BASE DE DATOS
+    function aprobarEnfermero(id) {
+        if (confirm("¿Desea aprobar la cuenta de este enfermero para que pueda iniciar sesión?")) {
+            window.location.href = `/enfermero/${id}/aprobar/`;
+        }
+    }
+
+    // ABRIR MODAL BAJA LÓGICA
+    function openBajaModal(id) {
+        enfermeroABajar = enfermeros.find(e => e.id === id);
+        if (!enfermeroABajar) return;
+        document.getElementById('baja-nombre').innerText = enfermeroABajar.nombre;
+        document.getElementById('modal-baja').classList.remove('hidden');
+    }
+
+    // CONFIRMAR BAJA EN BASE DE DATOS
+    function confirmarBaja() {
+        if (!enfermeroABajar) return;
+        window.location.href = `/enfermero/${enfermeroABajar.id}/baja/`;
+    }
+
+    // SELECCIONAR Y MOSTRAR PERFIL DETALLADO
+    function selectEnfermero(id) {
+        selectedEnfermeroId = id;
+        renderList();
+        const enf = enfermeros.find(e => e.id === id);
+        const panel = document.getElementById('quick-preview-panel');
+        if (!enf) return;
+
+        panel.innerHTML = `
+            <div class="text-center pb-4 border-b border-gray-100">
+                <div class="w-16 h-16 rounded-full ${enf.avatarBg} font-bold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner">
+                    ${enf.avatar}
+                </div>
+                <h4 class="font-bold text-gray-900 text-base">${enf.nombre}</h4>
+                <p class="text-xs font-semibold text-emerald-800 bg-emerald-50 inline-block px-2.5 py-0.5 rounded-full border border-emerald-200 mt-1">
+                    ${enf.puesto}
+                </p>
+            </div>
+            <div class="py-4 space-y-3.5 text-xs">
+                <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                    <span class="text-gray-500 font-medium">Servicio:</span>
+                    <span class="font-bold text-gray-800">${enf.servicioHospital}</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                    <span class="text-gray-500 font-medium">DNI:</span>
+                    <span class="font-mono font-semibold text-gray-800">${enf.dni}</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-gray-50 pb-2">
+                    <span class="text-gray-500 font-medium">Matrícula:</span>
+                    <span class="font-mono font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">${enf.matricula}</span>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-50 pb-2">
+                    <span class="text-gray-500 font-medium">Correo:</span>
+                    <span class="font-medium text-gray-800 text-right break-all pl-2">${enf.email}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 font-medium">Teléfono:</span>
+                    <span class="font-semibold text-gray-800">${enf.telefono}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // MODAL SISA CON VALORES SIMULADOS / ESTÁTICOS
+    function openSISAModal(id) {
+        const enf = enfermeros.find(e => e.id === id);
+        if (!enf) return;
+        document.getElementById('sisa-nombre').innerText = enf.nombre;
+        document.getElementById('sisa-matricula').innerText = enf.matricula;
+        document.getElementById('sisa-especialidad').innerText = enf.sisa.especialidad;
+        document.getElementById('modal-sisa').classList.remove('hidden');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+</script>
 {% endblock %}
