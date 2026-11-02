@@ -65,6 +65,11 @@ class Enfermero(models.Model):
   verificado = models.BooleanField(
       default=False, verbose_name='Cuenta Verificada'
   )
+  
+  # Campo para indicar si el enfermero esta o no, activo en el hospital.
+  activo = models.BooleanField(
+      default=True, verbose_name='Nómina Activa en Servicio'
+  )
 
   def __str__(self):
     return (
