@@ -53,7 +53,7 @@
             <!-- SELECTOR DE SECTORES (Fijos) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button onclick="cambiarSector('varones')" id="btn-sector-varones"
-                    class="p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between">
+                    class="p-4 rounded-xl border text-left transition-all bg-teal-900 text-white shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300"
                             id="sub-varones">Sector 01</span>
@@ -63,7 +63,7 @@
                 </button>
 
                 <button onclick="cambiarSector('mujeres')" id="btn-sector-mujeres"
-                    class="p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between">
+                    class="p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-teal-600 text-gray-800 flex items-center justify-between">
                     <div>
                         <span class="text-[10px] uppercase font-bold tracking-wider text-gray-400"
                             id="sub-mujeres">Sector 02</span>
@@ -100,7 +100,7 @@
         class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
         <form id="form-asignar" method="POST" action="">
             {% csrf_token %}
-            <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
+            <div class="bg-cyan-950 text-white p-5 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
                         <i class="fa-solid fa-user-plus text-lg"></i>
@@ -135,7 +135,7 @@
                     Cancelar
                 </button>
                 <button type="submit"
-                    class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                    class="px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
                     <i class="fa-solid fa-check"></i>
                     <span>Confirmar Asignación</span>
                 </button>
@@ -176,20 +176,20 @@
         // Cambiar estilos visuales de los botones según el sector activo
         if (sector === 'varones') {
             if (btnVarones) {
-                btnVarones.className = "p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between";
+                btnVarones.className = "p-4 rounded-xl border text-left transition-all bg-teal-900 text-white shadow-sm flex items-center justify-between";
                 subVarones.className = "text-[10px] uppercase font-bold tracking-wider text-emerald-300";
             }
             if (btnMujeres) {
-                btnMujeres.className = "p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between";
+                btnMujeres.className = "p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-teal-600 text-gray-800 flex items-center justify-between";
                 subMujeres.className = "text-[10px] uppercase font-bold tracking-wider text-gray-400";
             }
         } else {
             if (btnVarones) {
-                btnVarones.className = "p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-forest-600 text-gray-800 flex items-center justify-between";
+                btnVarones.className = "p-4 rounded-xl border text-left transition-all bg-white border-gray-200 hover:border-teal-600 text-gray-800 flex items-center justify-between";
                 subVarones.className = "text-[10px] uppercase font-bold tracking-wider text-gray-400";
             }
             if (btnMujeres) {
-                btnMujeres.className = "p-4 rounded-xl border text-left transition-all bg-forest-800 text-white shadow-sm flex items-center justify-between";
+                btnMujeres.className = "p-4 rounded-xl border text-left transition-all bg-teal-900 text-white shadow-sm flex items-center justify-between";
                 subMujeres.className = "text-[10px] uppercase font-bold tracking-wider text-emerald-300";
             }
         }
@@ -277,7 +277,7 @@
                     // Botones si está ocupada: Ver Planilla (enlace) + Liberar Cama (botón)
                     botonesAccion = `
                             <div class="flex items-center space-x-2">
-                                <a href="/planillas/${cama.paciente_id}" class="px-3 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
+                                <a href="/planillas/${cama.paciente_id}" class="px-3 py-1.5 bg-sky-900 hover:bg-sky-700 text-white font-semibold text-xs rounded-lg transition-colors flex items-center space-x-1.5 shadow-xs">
                                     <i class="fa-solid fa-clipboard-user text-xs"></i>
                                     <span>Ver Planilla</span>
                                 </a>
