@@ -7,6 +7,8 @@ import json  # Para convertir datos de Python a JSON y enviarlos al template
 from .models import Enfermero, Paciente, Sector, Habitacion, Cama
 
 # Create your views here.
+
+#* Controladores para el login y el logout de usuarios --------------------------------------
 def mostrar_registro_usuario(request):
     if request.method == 'POST':
         # 1 Capturamos los datos enviados desde el formulario HTML
@@ -98,8 +100,6 @@ def mostrar_registro_usuario(request):
     else:  # Si la petición es GET, simplemente mostramos el formulario vacío
         return render(request, 'Registro_Usuario.html')
 
-
-
 #? Autenticacion del usuario (login) 
 def mostrar_login_usuario(request):
     if request.method == 'POST':
@@ -135,7 +135,10 @@ def mostrar_login_usuario(request):
                 messages.success(request, f'¡Bienvenido/a, {enfermero.nombre}!')
 
                 # 3. Redirigimos al dashboard o panel principal (ejemplo: 'dashboard')
-                return redirect('gestion_enfermeros')  # Cambia por la URL de tu pantalla principal
+                if request.session['rol'] == 'jefe':
+                    return redirect('gestion_enfermeros')  # Redirige a la gestión de enfermeros
+                else:
+                    return redirect('sector_camas')  # Cambia por la URL de tu pantalla principal
             else:
                 messages.error(
                     request,
@@ -151,10 +154,17 @@ def mostrar_login_usuario(request):
 
 #? Cerrar sesión del usuario
 def cerrar_sesion(request):
-  request.session.flush()  # Borra toda la sesión del usuario
+  # 1. Limpiamos cualquier mensaje acumulado previamente en el storage
+  storage = messages.get_messages(request)
+  storage.used = (True ) # Esto marca todos los mensajes pendientes como ya leídos/ignorados
+
+  # 2. Borramos toda la sesión del usuario (esto también vaciará el storage actual)
+  request.session.flush()
+  # 3. Agregamos únicamente el mensaje limpio de cierre de sesión
   messages.info(request, 'Has cerrado sesión correctamente.')
   return redirect('login_usuario')  # Redirige a tu vista de login
 
+#* ---------------------
 
 
 def mostrar_home(request):
@@ -163,11 +173,89 @@ def mostrar_home(request):
 def mostrar_pacientes(request):
     return render(request, 'Gestion_Pacientes.html')
 
+#* Controlador para mostrar la gestión de enfermeros --------------------------
 def mostrar_enfermeros(request):
-    return render(request, 'Gestion_Enfermeros.html')
+  # 1. Validación de seguridad y rol (Si no es jefe de enfermeros, deniega el acceso)
+  # Adaptar 'request.session' o 'request.user' según tu sistema de sesión actual
+  rol_usuario = request.session.get('rol', '')
+  if rol_usuario != 'jefe':
+    messages.error(
+        request, 'Acceso denegado: Se requieren permisos de Jefe de Enfermeros.'
+    )
+    # Pasa lista vacía para que el HTML muestre el mensaje de aviso/error
+    context = {
+        'enfermeros_list': [],
+        'es_jefe': False,
+    }
+    return render(request, 'Gestion_Enfermeros.html', context)
+
+  # 2. Obtenemos solo la nómina activa de enfermeros (baja lógica: activo=True)
+  enfermeros_qs = Enfermero.objects.filter(activo=True).order_by(
+      '-fecha_registro'
+  )
+
+  # 3. Serializamos la lista a un diccionario para pasarlo limpiamente al frontend
+  enfermeros_list = []
+  for enf in enfermeros_qs:
+    # Generar iniciales para el avatar
+    iniciales = (
+        f'{enf.nombre[0]}{enf.apellido[0]}'.upper()
+        if enf.nombre and enf.apellido
+        else 'EN'
+    )
+
+    enfermeros_list.append({
+        'id': enf.id,
+        'nombre': f'{enf.nombre} {enf.apellido}',
+        'dni': enf.dni,
+        'matricula': enf.matricula,
+        'email': enf.email,
+        'telefono': enf.telefono,
+        'puesto': enf.tipo_profesional,
+        'servicioHospital': enf.servicio,
+        'verificado': enf.verificado,
+        'sisa': {
+            'especialidad': (
+                f'{enf.tipo_profesional} registrado en Salud Mental'
+            )
+        },
+        'avatar': iniciales,
+        'avatarBg': (
+            'bg-emerald-100 text-emerald-800'
+            if enf.verificado
+            else 'bg-amber-100 text-amber-800'
+        ),
+    })
+
+  context = {
+      # ¡Pásalo como lista de Python pura, sin json.dumps!
+      'enfermeros_list': enfermeros_list,
+      'es_jefe': True,
+  }
+  return render(request, 'Gestion_Enfermeros.html', context)
 
 
-# Controladores para la gestión de camas y sectores
+# Endpoint: Aprobar / Verificar Cuenta de Enfermero
+def aprobar_enfermero_view(request, enfermero_id):
+  if request.method == 'POST' or request.method == 'GET':
+    enfermero = get_object_or_404(Enfermero, id=enfermero_id)
+    enfermero.verificado = True
+    enfermero.save()
+  return redirect('gestion_enfermeros')
+
+
+# Endpoint: Dar de baja lógica (Conservando registros históricos)
+def dar_baja_enfermero_view(request, enfermero_id):
+  if request.method == 'POST' or request.method == 'GET':
+    enfermero = get_object_or_404(Enfermero, id=enfermero_id)
+    enfermero.activo = False  # Baja lógica
+    enfermero.save()
+  return redirect('gestion_enfermeros')
+
+
+
+
+#* Controladores para la gestión de camas y sectores --------------------------
 def mostrar_sector_camas(request):
   datos_sectores = {}
 
@@ -224,7 +312,7 @@ def mostrar_sector_camas(request):
 
   return render(request, 'Sector_Camas.html', context)
 
-# Vista para liberar una cama ocupada
+#? Vista para liberar una cama ocupada
 def liberar_cama_view(request, cama_id):
     # Buscamos la cama o devolvemos 404 si no existe
     cama = get_object_or_404(Cama, id=cama_id)
@@ -236,7 +324,7 @@ def liberar_cama_view(request, cama_id):
     # Redirigimos de vuelta a la vista de sectores y camas
     return redirect('sector_camas') # Asegúrate de usar el nombre de tu URL actual
 
-# NUEVA VISTA PARA PROCESAR LA ASIGNACIÓN
+#? NUEVA VISTA PARA PROCESAR LA ASIGNACIÓN
 def asignar_paciente_view(request, cama_id):
   if request.method == 'POST':
     cama = get_object_or_404(Cama, id=cama_id)

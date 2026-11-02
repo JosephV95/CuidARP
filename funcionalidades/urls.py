@@ -6,7 +6,11 @@ urlpatterns = [
     
     # path('home/', views.home_view, name='home'),
     path('pacientes/', views.mostrar_pacientes, name='gestion_pacientes'),
+    
+    # Rutas para la gestión de enfermeros
     path('enfermeros/', views.mostrar_enfermeros, name='gestion_enfermeros'),
+    path('enfermero/<int:enfermero_id>/aprobar/', views.aprobar_enfermero_view, name='aprobar_enfermero' ),
+    path('enfermero/<int:enfermero_id>/baja/', views.dar_baja_enfermero_view, name='dar_baja_enfermero' ),
     
     # Rutas para la gestión de camas
     path('camas/', views.mostrar_sector_camas, name='sector_camas'),
