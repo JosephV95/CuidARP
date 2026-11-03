@@ -470,72 +470,136 @@
     <script>
         // ESTRUCTURA DE PACIENTES ADAPTADA AL MODELO DJANGO (models.py)
         let pacientes = [
+    {
+        id: 101,
+        nombre: "Gonzalo",
+        apellido: "Fernández",
+        dni: "29405122",
+        fecha_nacimiento: "1982-03-12",
+        fechaNacimientoDisplay: "12/03/1982",
+        email: "g.fernandez@correo.com",
+        obra_social: "PAMI / Incluir Salud",
+        sexo_paciente: "Masculino",
+        telefono: "261458963",
+        direccion: "San Martín 450, Mendoza",
+        estado_paciente: "Internado",
+        estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
+        sector: "Sector Varones",
+        habitacion: "02",
+        cama: "Cama 12",
+        avatar: "GF",
+        avatarBg: "bg-sky-100 text-sky-800",
+        recetas: [
             {
-                id: 101,
-                nombre: "Gonzalo",
-                apellido: "Fernández",
-                dni: "29405122",
-                fecha_nacimiento: "1982-03-12",
-                fechaNacimientoDisplay: "12/03/1982",
-                email: "g.fernandez@correo.com",
-                obra_social: "PAMI / Incluir Salud",
-                sexo_paciente: "Masculino",
-                telefono: "261458963",
-                direccion: "San Martín 450, Mendoza",
-                estado_paciente: "Internado",
-                estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
-                sector: "Sector Varones",
-                habitacion: "02",
-                cama: "Cama 12",
-                avatar: "GF",
-                avatarBg: "bg-sky-100 text-sky-800",
-                recetas: [
-                    {
-                        idReceta: 1001,
-                        fecha: "10/08/2026",
-                        medico: "Dr. Roberto Arlt",
-                        estado: "Activo",
-                        medicaciones: [
-                            { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", observaciones: "Acompañar con alimentos" },
-                            { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", observaciones: "Caso de agitación" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 102,
-                nombre: "Valentina",
-                apellido: "Rossi",
-                dni: "38109822",
-                fecha_nacimiento: "1994-11-05",
-                fechaNacimientoDisplay: "05/11/1994",
-                email: "",
-                obra_social: "OSEP Mendoza",
-                sexo_paciente: "Femenino",
-                telefono: "261789412",
-                direccion: "Belgrano 1200, Godoy Cruz",
-                estado_paciente: "De Alta",
-                estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
-                diagnostico: "Trastorno Límite de la Personalidad",
-                sector: "Sector Mujeres",
-                habitacion: "05",
-                cama: "Cama 05",
-                avatar: "VR",
-                avatarBg: "bg-purple-100 text-purple-800",
-                recetas: [
-                    {
-                        idReceta: 1002,
-                        fecha: "09/08/2026",
-                        medico: "Dra. Ana Gómez",
-                        estado: "Vencido",
-                        medicaciones: [
-                            { farmaco: "Quetiapina", dosis: "100 mg", via: "Subcutánea", frecuencia: "Al acostarse", observaciones: "Controlar tolerancia" }
-                        ]
-                    }
+                idReceta: 1001,
+                fecha: "10/08/2026",
+                medico: "Dr. Roberto Arlt",
+                estado: "Activo",
+                medicaciones: [
+                    { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", observaciones: "Acompañar con alimentos" },
+                    { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", observaciones: "Caso de agitación" }
                 ]
             }
-        ];
+        ]
+    },
+    {
+        id: 102,
+        nombre: "Valentina",
+        apellido: "Rossi",
+        dni: "38109822",
+        fecha_nacimiento: "1994-11-05",
+        fechaNacimientoDisplay: "05/11/1994",
+        email: "",
+        obra_social: "OSEP Mendoza",
+        sexo_paciente: "Femenino",
+        telefono: "261789412",
+        direccion: "Belgrano 1200, Godoy Cruz",
+        estado_paciente: "De Alta",
+        estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
+        diagnostico: "Trastorno Límite de la Personalidad",
+        sector: "Sector Mujeres",
+        habitacion: "05",
+        cama: "Cama 05",
+        avatar: "VR",
+        avatarBg: "bg-purple-100 text-purple-800",
+        recetas: [
+            {
+                idReceta: 1002,
+                fecha: "09/08/2026",
+                medico: "Dra. Ana Gómez",
+                estado: "Vencido",
+                medicaciones: [
+                    { farmaco: "Quetiapina", dosis: "100 mg", via: "Subcutánea", frecuencia: "Al acostarse", observaciones: "Controlar tolerancia" }
+                ]
+            }
+        ]
+    },
+    {
+        id: 103,
+        nombre: "Lucas",
+        apellido: "Giménez",
+        dni: "34112983",
+        fecha_nacimiento: "1989-07-22",
+        fechaNacimientoDisplay: "22/07/1989",
+        email: "lucas.gimenez@gmail.com",
+        obra_social: "OSDE",
+        sexo_paciente: "Masculino",
+        telefono: "261554433",
+        direccion: "Las Heras 340, Mendoza",
+        estado_paciente: "Internado",
+        estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        diagnostico: "Depresión Mayor Recurrente (F33.1)",
+        sector: "Sector Varones",
+        habitacion: "03",
+        cama: "Cama 08",
+        avatar: "LG",
+        avatarBg: "bg-emerald-100 text-emerald-800",
+        recetas: [
+            {
+                idReceta: 1003,
+                fecha: "12/08/2026",
+                medico: "Dr. Roberto Arlt",
+                estado: "Activo",
+                medicaciones: [
+                    { farmaco: "Sertralina", dosis: "50 mg", via: "Oral", frecuencia: "Cada 24 hs", observaciones: "Tomar por la mañana" }
+                ]
+            }
+        ]
+    },
+    {
+        id: 104,
+        nombre: "Sofía",
+        apellido: "Pérez",
+        dni: "41223901",
+        fecha_nacimiento: "1999-01-15",
+        fechaNacimientoDisplay: "15/01/1999",
+        email: "sofia.perez@correo.com",
+        obra_social: "Swiss Medical",
+        sexo_paciente: "Femenino",
+        telefono: "261678901",
+        direccion: "España 890, Ciudad de Mendoza",
+        estado_paciente: "En Observación",
+        estadoBadge: "bg-amber-100 text-amber-800 border-amber-200",
+        diagnostico: "Trastorno de Ansiedad Generalizada (F41.1)",
+        sector: "Hospital de Día",
+        habitacion: "01",
+        cama: "Cama 02",
+        avatar: "SP",
+        avatarBg: "bg-pink-100 text-pink-800",
+        recetas: [
+            {
+                idReceta: 1004,
+                fecha: "14/08/2026",
+                medico: "Dra. Ana Gómez",
+                estado: "Activo",
+                medicaciones: [
+                    { farmaco: "Lorazepam", dosis: "1 mg", via: "Oral", frecuencia: "Cada 8 hs", observaciones: "Según evolución clínica" }
+                ]
+            }
+        ]
+    }
+];
 
         let selectedPatientId = 101;
 
