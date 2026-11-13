@@ -11,6 +11,8 @@ urlpatterns = [
     path('pacientes/crear/', views.crear_paciente_view, name='crear_paciente'),
     path('pacientes/<int:paciente_id>/editar/', views.editar_paciente_view, name='editar_paciente'),
     
+    path('pacientes/<int:paciente_id>/recetas/crear/', views.crear_receta_view, name='crear_receta'),
+    
     # Rutas para la gestión de enfermeros
     path('enfermeros/', views.mostrar_enfermeros, name='gestion_enfermeros'),
     path('enfermero/<int:enfermero_id>/aprobar/', views.aprobar_enfermero_view, name='aprobar_enfermero' ),

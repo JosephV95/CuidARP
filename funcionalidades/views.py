@@ -3,7 +3,7 @@ from django.contrib import messages  # Para mostrar alertas amigables
 # import json  # Para convertir datos de Python a JSON y enviarlos al template
 
 # Importar los modelos de la app funcionalidades
-from .models import Enfermero, Paciente, Sector, Cama, Receta, RegistroAdministracion
+from .models import Enfermero, Paciente, Sector, Cama, Receta, MedicacionReceta, RegistroAdministracion
 
 # Create your views here.
 
@@ -517,8 +517,51 @@ def asignar_paciente_view(request, cama_id):
     )  # Reemplaza con el nombre de tu URL actual para esta vista
 
 
-# PRUEBAS PLANILLAS
+# Controladores para la creacion de Recetas y sus Medicaciones asociadas
 
+def crear_receta_view(request, paciente_id):
+    if request.method == "POST":
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+
+        # 1. Capturar datos de la cabecera de la receta
+        numero_receta = request.POST.get("numero_receta")
+        medico_prescriptor = request.POST.get("medico_prescriptor")
+        fecha = request.POST.get("fecha")
+
+        # 2. Crear la Receta principal
+        receta = Receta.objects.create(
+            paciente=paciente,
+            numero_receta=numero_receta,
+            medico_prescriptor=medico_prescriptor,
+            fecha=fecha,
+            estado="Activo",  # Por defecto al crearla nace activa
+        )
+
+        # 3. Capturar las listas de fármacos enviadas desde el form dinámico
+        farmacos = request.POST.getlist("farmaco[]")
+        dosis_list = request.POST.getlist("dosis[]")
+        vias = request.POST.getlist("via[]")
+        frecuencias = request.POST.getlist("frecuencia[]")
+        observaciones_list = request.POST.getlist("observaciones[]")
+
+        # 4. Iterar y guardar cada medicamento asociado a esta receta
+        for i in range(len(farmacos)):
+            if farmacos[i].strip() and dosis_list[i].strip():
+                MedicacionReceta.objects.create(
+                    receta=receta,
+                    farmaco=farmacos[i],
+                    dosis=dosis_list[i],
+                    via=vias[i] if i < len(vias) else "Oral",
+                    frecuencia=frecuencias[i] if i < len(frecuencias) else "",
+                    observaciones=(
+                        observaciones_list[i] if i < len(observaciones_list) else ""
+                    ),
+                )
+
+        messages.success(request, f"Receta N° {numero_receta} prescripta con éxito.")
+    return redirect("gestion_pacientes")
+
+# PRUEBAS PLANILLAS
 
 def mostrar_planillas(request, paciente_id=None):
     # Si ingresan a /planillas/ sin ID, seleccionamos el primer paciente disponible automáticamente

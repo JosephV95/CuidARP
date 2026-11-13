@@ -2,450 +2,524 @@
 
 {% block contenido %}
 
-    <!-- ================= CONTENIDO PRINCIPAL ================= -->
-    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        <!-- Top Navigation Header -->
-        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
-            <!-- Buscador general de pacientes -->
-            <div class="relative w-full max-w-lg">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                </span>
-                <input type="text" id="search-patient" onkeyup="filterPacientes()"
-                       placeholder="Buscar paciente por nombre, DNI, cama o sector..." 
-                       class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
-                </div>
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+        <!-- Buscador general de pacientes -->
+        <div class="relative w-full max-w-lg">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </span>
+            <input type="text" id="search-patient" onkeyup="filterPacientes()"
+                placeholder="Buscar paciente por nombre, DNI, cama o sector..."
+                class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <kbd
+                    class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘
+                    K</kbd>
             </div>
+        </div>
 
-            <!-- Derecha: Notificaciones e Info del Hospital -->
-            <div class="flex items-center space-x-6">
-                <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                    <i class="fa-regular fa-bell text-lg"></i>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
-                </button>
+        <!-- Derecha: Notificaciones e Info del Hospital -->
+        <div class="flex items-center space-x-6">
+            <button
+                class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                <i class="fa-regular fa-bell text-lg"></i>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
+            </button>
 
-                <div class="text-right border-l border-gray-200 pl-6">
-                    <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra - Internación</p>
-                    <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
-                </div>
+            <div class="text-right border-l border-gray-200 pl-6">
+                <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra - Internación</p>
+                <p class="text-sm font-bold text-gray-800">Mié, 14 de agosto</p>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Área de Contenido Scrollable -->
-        <main class="flex-1 overflow-y-auto p-8">
-            <div class="max-w-7xl mx-auto space-y-6">
+    <!-- Área de Contenido Scrollable -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
 
-                <!-- HEADER SECCIÓN Y METRICAS DE PACIENTES INTERNADOS -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h2 class="text-2xl font-bold text-gray-900">Nómina de Pacientes Internados</h2>
-                            <span id="badge-patients-count" class="bg-forest-100 text-forest-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-forest-500/20">
-                                0
-                            </span>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">Gestión integral de fichas clínicas, asignación de camas y recetarios.</p>
+            <!-- HEADER SECCIÓN Y METRICAS DE PACIENTES INTERNADOS -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h2 class="text-2xl font-bold text-gray-900">Nómina de Pacientes Internados</h2>
+                        <span id="badge-patients-count"
+                            class="bg-forest-100 text-forest-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-forest-500/20">
+                            0
+                        </span>
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">Gestión integral de fichas clínicas, asignación de camas y
+                        recetarios.</p>
+                </div>
 
-                    <!-- Botón para nuevo paciente -->
-                    <div class="flex items-center space-x-3">
-                        <button onclick="openNuevoPacienteModal()" class="bg-forest-800 hover:bg-forest-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
-                            <i class="fa-solid fa-user-plus text-xs"></i>
-                            <span>Agregar Nuevo Paciente</span>
+                <!-- Botón para nuevo paciente -->
+                <div class="flex items-center space-x-3">
+                    <button onclick="openNuevoPacienteModal()"
+                        class="bg-cyan-800 hover:bg-cyan-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                        <span>Agregar Nuevo Paciente</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR PRINCIPAL: GRILLA LISTADO + PERFIL DERECHA (3 COLS ORIGINAL) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- COLUMNA IZQUIERDA (2 COLS): LISTADO DE PACIENTES -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-100">
+                            <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-bed text-forest-800"></i>
+                                <span>Pacientes Registrados</span>
+                            </h3>
+                            <span class="text-xs text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</span>
+                        </div>
+
+                        <!-- CONTENEDOR TARJETAS PACIENTES -->
+                        <div id="pacientes-container" class="mt-4 space-y-3">
+                            <!-- Se renderiza vía JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA (1 COL): FICHA CLÍNICA & RECETARIO ORIGINAL -->
+                <div class="lg:col-span-1">
+                    <div
+                        class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                        <div class="flex items-center justify-between pb-2 border-b border-gray-100 mb-2">
+                            <h3
+                                class="font-bold text-gray-800 text-sm uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-hospital-user text-forest-800"></i>
+                                <span>Ficha Clínica & Recetario</span>
+                            </h3>
+                        </div>
+
+                        <!-- CONTENIDO DINÁMICO DEL PERFIL Y RECETA -->
+                        <div id="patient-preview-panel">
+                            <!-- Se renderiza por JS al seleccionar un paciente -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- ================= MODAL 1: AGREGAR NUEVO PACIENTE ================= -->
+<div id="modal-nuevo-paciente"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+
+        <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-300">
+                    <i class="fa-solid fa-user-plus text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-base leading-tight">Agregar Nuevo Paciente</h4>
+                    <p class="text-xs text-emerald-200/80">Ingreso de ficha clínica al sistema</p>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-nuevo-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form id="form-nuevo-paciente" method="POST" action="{% url 'crear_paciente' %}">
+            {% csrf_token %}
+            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
+                        <input type="text" id="add-nombre" name="nombre"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
+                        <input type="text" id="add-apellido" name="apellido"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
+                        <input type="text" id="add-dni" name="dni"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                        <input type="date" id="add-fecha_nacimiento" name="fecha_nacimiento"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="add-email" name="email" placeholder="familiar@correo.com"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
+                        <input type="text" id="add-obra_social" name="obra_social"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
+                        <select id="add-sexo_paciente" name="sexo_paciente"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="No binario">No binario</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
+                        <input type="text" id="add-telefono" name="telefono"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
+                        <select id="add-estado_paciente" name="estado_paciente"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                            <option value="Internado" selected>Internado</option>
+                            <option value="De Alta">De Alta</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
+                        <input type="text" id="add-direccion" name="direccion"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <!-- ASIGNACIÓN DE UBICACIÓN -->
+
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
+                    <textarea id="add-diagnostico" name="diagnostico" rows="2"
+                        class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                        required></textarea>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button type="button" onclick="closeModal('modal-nuevo-paciente')"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" onclick="saveNuevoPaciente()"
+                    class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Guardar Paciente</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= MODAL 2: EDITAR DATOS DEL PACIENTE ================= -->
+<div id="modal-editar-paciente"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+
+        <div class="bg-gray-900 text-white p-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-pen-to-square text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-base leading-tight">Editar Ficha del Paciente</h4>
+                    <p class="text-xs text-gray-300">Modificación de datos del registro</p>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-editar-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form id="form-editar-paciente" method="POST" action="">
+            {% csrf_token %}
+            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                <input type="hidden" id="edit-patient-id" name="id">
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
+                        <input type="text" id="edit-nombre" name="nombre"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
+                        <input type="text" id="edit-apellido" name="apellido"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
+                        <input type="text" id="edit-dni" name="dni"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                        <input type="date" id="edit-fecha_nacimiento" name="fecha_nacimiento"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="edit-email" name="email"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
+                        <input type="text" id="edit-obra_social" name="obra_social"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
+                        <select id="edit-sexo_paciente" name="sexo_paciente"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="No binario">No binario</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
+                        <input type="text" id="edit-telefono" name="telefono"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
+                        <select id="edit-estado_paciente" name="estado_paciente"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                            <option value="Internado">Internado</option>
+                            <option value="De Alta">De Alta</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
+                        <input type="text" id="edit-direccion" name="direccion"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
+                    <textarea id="edit-diagnostico" name="diagnostico" rows="2"
+                        class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                        required></textarea>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
+                <button type="button" onclick="closeModal('modal-editar-paciente')"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" onclick="savePatientEdit()"
+                    class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Guardar Cambios</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= MODAL 3: AGREGAR NUEVA RECETA ================= -->
+<div id="modal-receta"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
+
+        <div class="bg-sky-950 text-white p-5 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-300 border border-white/20">
+                    <i class="fa-solid fa-file-prescription text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-base leading-tight">Prescribir Receta Médica</h4>
+                    <p class="text-xs text-emerald-200/80">CuidARP - Registro de Medicación</p>
+                </div>
+            </div>
+            <button onclick="closeModal('modal-receta')"
+                class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <form id="form-receta" method="POST" action="" class="flex flex-col flex-1 overflow-hidden">
+            {% csrf_token %}
+            <div class="p-6 overflow-y-auto space-y-5">
+                <div
+                    class="bg-forest-50 border border-forest-200/80 rounded-xl p-3.5 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] text-forest-700 font-semibold uppercase tracking-wider">Paciente
+                            Destino</span>
+                        <h5 id="receta-modal-paciente" class="font-bold text-forest-900 text-sm">--</h5>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">N° de Receta *</label>
+                        <input type="text" id="receta-numero" name="numero_receta" placeholder="Ej: 1042"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Médico prescriptor *</label>
+                        <input type="text" id="receta-medico" name="medico_prescriptor" placeholder="Nombre del médico"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none font-medium"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Fecha *</label>
+                        <input type="date" id="receta-fecha" name="fecha"
+                            class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none"
+                            required>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <h5
+                            class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-1.5">
+                            <i class="fa-solid fa-pills text-forest-700"></i>
+                            <span>Fármacos e Indicaciones</span>
+                        </h5>
+                        <button type="button" onclick="addFarmacoRow()"
+                            class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-lg transition-colors flex items-center space-x-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i>
+                            <span>Agregar Fármaco</span>
                         </button>
                     </div>
-                </div>
 
-                <!-- CONTENEDOR PRINCIPAL: GRILLA LISTADO + PERFIL DERECHA (3 COLS ORIGINAL) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    <!-- COLUMNA IZQUIERDA (2 COLS): LISTADO DE PACIENTES -->
-                    <div class="lg:col-span-2 space-y-4">
-                        <div class="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs">
-                            <div class="flex items-center justify-between pb-4 border-b border-gray-100">
-                                <h3 class="font-bold text-gray-800 text-base flex items-center space-x-2">
-                                    <i class="fa-solid fa-bed text-forest-800"></i>
-                                    <span>Pacientes Registrados</span>
-                                </h3>
-                                <span class="text-xs text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</span>
-                            </div>
-
-                            <!-- CONTENEDOR TARJETAS PACIENTES -->
-                            <div id="pacientes-container" class="mt-4 space-y-3">
-                                <!-- Se renderiza vía JS -->
-                            </div>
-                        </div>
+                    <div id="farmacos-container" class="space-y-3">
+                        <!-- Filas dinámicas de fármacos -->
                     </div>
-
-                    <!-- COLUMNA DERECHA (1 COL): FICHA CLÍNICA & RECETARIO ORIGINAL -->
-                    <div class="lg:col-span-1">
-                        <div class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs sticky top-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                            <div class="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
-                                <h3 class="font-bold text-gray-800 text-sm uppercase tracking-wider flex items-center space-x-2">
-                                    <i class="fa-solid fa-hospital-user text-forest-800"></i>
-                                    <span>Ficha Clínica & Recetario</span>
-                                </h3>
-                            </div>
-
-                            <!-- CONTENIDO DINÁMICO DEL PERFIL Y RECETA -->
-                            <div id="patient-preview-panel">
-                                <!-- Se renderiza por JS al seleccionar un paciente -->
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-
             </div>
-        </main>
-    </div>
 
-    <!-- ================= MODAL 1: AGREGAR NUEVO PACIENTE ================= -->
-    <div id="modal-nuevo-paciente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-            
-            <div class="bg-forest-800 text-white p-5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-emerald-300">
-                        <i class="fa-solid fa-user-plus text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base leading-tight">Agregar Nuevo Paciente</h4>
-                        <p class="text-xs text-emerald-200/80">Ingreso de ficha clínica al sistema</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('modal-nuevo-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+            <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100 flex-shrink-0">
+                <button type="button" onclick="closeModal('modal-receta')"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" onclick="saveReceta()"
+                    class="px-5 py-2 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Guardar Receta</span>
                 </button>
             </div>
-
-            <form id="form-nuevo-paciente" method="POST" action="{% url 'crear_paciente' %}">
-                {% csrf_token %}
-                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
-                            <input type="text" id="add-nombre" name="nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
-                            <input type="text" id="add-apellido" name="apellido" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
-                            <input type="text" id="add-dni" name="dni" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
-                            <input type="date" id="add-fecha_nacimiento" name="fecha_nacimiento" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
-                            <input type="email" id="add-email" name="email" placeholder="familiar@correo.com" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
-                            <input type="text" id="add-obra_social" name="obra_social" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
-                            <select id="add-sexo_paciente" name="sexo_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="No binario">No binario</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
-                            <input type="text" id="add-telefono" name="telefono" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
-                            <select id="add-estado_paciente" name="estado_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                                <option value="Internado" selected>Internado</option>
-                                <option value="De Alta">De Alta</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
-                            <input type="text" id="add-direccion" name="direccion" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <!-- ASIGNACIÓN DE UBICACIÓN -->
-                    
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
-                        <textarea id="add-diagnostico" name="diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required></textarea>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-                    <button type="button" onclick="closeModal('modal-nuevo-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" onclick="saveNuevoPaciente()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Guardar Paciente</span>
-                    </button>
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
+</div>
 
-    <!-- ================= MODAL 2: EDITAR DATOS DEL PACIENTE ================= -->
-    <div id="modal-editar-paciente" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-            
-            <div class="bg-gray-900 text-white p-5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
-                        <i class="fa-solid fa-pen-to-square text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base leading-tight">Editar Ficha del Paciente</h4>
-                        <p class="text-xs text-gray-300">Modificación de datos del registro</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('modal-editar-paciente')" class="text-white/80 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
+<!-- TOAST DE NOTIFICACIÓN -->
+<div id="toast"
+    class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <span id="toast-msg">Acción realizada con éxito</span>
+</div>
 
-            <form id="form-editar-paciente" method="POST" action="">
-                {% csrf_token %}
-                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-                    <input type="hidden" id="edit-patient-id" name="id">
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Nombre *</label>
-                            <input type="text" id="edit-nombre" name="nombre" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Apellido *</label>
-                            <input type="text" id="edit-apellido" name="apellido" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
+<!-- DATOS DE PACIENTES EN FORMATO JSON -->
+{{ pacientes_list|json_script:"pacientes-data" }}
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">DNI *</label>
-                            <input type="text" id="edit-dni" name="dni" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha de Nacimiento *</label>
-                            <input type="date" id="edit-fecha_nacimiento" name="fecha_nacimiento" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
+<script>
+    // ESTRUCTURA DE PACIENTES ADAPTADA AL MODELO DJANGO (models.py)
+    let pacientes = JSON.parse(document.getElementById('pacientes-data').textContent);
+    let selectedPatientId = pacientes.length > 0 ? pacientes[0].id : null;
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Correo Electrónico (Opcional)</label>
-                            <input type="email" id="edit-email" name="email" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Obra Social *</label>
-                            <input type="text" id="edit-obra_social" name="obra_social" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
+    window.onload = function () {
+        renderPacientes();
+        selectPatient(101);
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('receta-fecha').value = today;
+    };
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Sexo *</label>
-                            <select id="edit-sexo_paciente" name="sexo_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                                <option value="No binario">No binario</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Teléfono *</label>
-                            <input type="text" id="edit-telefono" name="telefono" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
+    // CONTAR PACIENTES INTERNADOS Y RENDERIZAR TARJETAS
+    function renderPacientes() {
+        const container = document.getElementById('pacientes-container');
+        container.innerHTML = '';
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Estado *</label>
-                            <select id="edit-estado_paciente" name="estado_paciente" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                                <option value="Internado">Internado</option>
-                                <option value="De Alta">De Alta</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Dirección *</label>
-                            <input type="text" id="edit-direccion" name="direccion" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
+        // Filtrar y contar solo pacientes internados para el badge del título
+        const internadosCount = pacientes.filter(p => p.estado_paciente === 'Internado').length;
+        document.getElementById('badge-patients-count').innerText = internadosCount;
 
-                    
-
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
-                        <textarea id="edit-diagnostico" name="diagnostico" rows="2" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required></textarea>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100">
-                    <button type="button" onclick="closeModal('modal-editar-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Guardar Cambios</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= MODAL 3: AGREGAR NUEVA RECETA ================= -->
-    <div id="modal-receta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all flex flex-col max-h-[90vh]">
-            
-            <div class="bg-forest-800 text-white p-5 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-emerald-300 border border-white/20">
-                        <i class="fa-solid fa-file-prescription text-lg"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-base leading-tight">Prescribir Receta Médica</h4>
-                        <p class="text-xs text-emerald-200/80">CuidARP - Registro de Medicación</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('modal-receta')" class="text-white/80 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <form id="form-receta" method="POST" action="" class="flex flex-col flex-1 overflow-hidden">
-                {% csrf_token %}
-                <div class="p-6 overflow-y-auto space-y-5">
-                    <div class="bg-forest-50 border border-forest-200/80 rounded-xl p-3.5 flex items-center justify-between">
-                        <div>
-                            <span class="text-[11px] text-forest-700 font-semibold uppercase tracking-wider">Paciente Destino</span>
-                            <h5 id="receta-modal-paciente" class="font-bold text-forest-900 text-sm">--</h5>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">N° de Receta *</label>
-                            <input type="text" id="receta-numero" name="numero_receta" placeholder="Ej: 1042" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Médico prescriptor *</label>
-                            <input type="text" id="receta-medico" name="medico_prescriptor" placeholder="Nombre del médico" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none font-medium" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Fecha *</label>
-                            <input type="date" id="receta-fecha" name="fecha" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center justify-between">
-                            <h5 class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center space-x-1.5">
-                                <i class="fa-solid fa-pills text-forest-700"></i>
-                                <span>Fármacos e Indicaciones</span>
-                            </h5>
-                            <button type="button" onclick="addFarmacoRow()" class="px-2.5 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-xs rounded-lg transition-colors flex items-center space-x-1">
-                                <i class="fa-solid fa-plus text-[10px]"></i>
-                                <span>Agregar Fármaco</span>
-                            </button>
-                        </div>
-
-                        <div id="farmacos-container" class="space-y-3">
-                            <!-- Filas dinámicas de fármacos -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-100 flex-shrink-0">
-                    <button type="button" onclick="closeModal('modal-receta')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="saveReceta()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-2 shadow-xs">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Guardar Receta</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- TOAST DE NOTIFICACIÓN -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-forest-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-medium z-50 transform translate-y-20 opacity-0 transition-all duration-300">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toast-msg">Acción realizada con éxito</span>
-    </div>
-
-    <!-- DATOS DE PACIENTES EN FORMATO JSON -->
-     {{ pacientes_list|json_script:"pacientes-data" }}
-
-    <script>
-        // ESTRUCTURA DE PACIENTES ADAPTADA AL MODELO DJANGO (models.py)
-        let pacientes = JSON.parse(document.getElementById('pacientes-data').textContent);
-        let selectedPatientId = pacientes.length > 0 ? pacientes[0].id : null;
-
-        window.onload = function() {
-            renderPacientes();
-            selectPatient(101);
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('receta-fecha').value = today;
-        };
-
-        // CONTAR PACIENTES INTERNADOS Y RENDERIZAR TARJETAS
-        function renderPacientes() {
-            const container = document.getElementById('pacientes-container');
-            container.innerHTML = '';
-
-            // Filtrar y contar solo pacientes internados para el badge del título
-            const internadosCount = pacientes.filter(p => p.estado_paciente === 'Internado').length;
-            document.getElementById('badge-patients-count').innerText = internadosCount;
-
-            if (pacientes.length === 0) {
-                container.innerHTML = `
+        if (pacientes.length === 0) {
+            container.innerHTML = `
                     <div class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                         <p class="text-xs text-gray-500 font-medium">No hay pacientes registrados en el sistema.</p>
                     </div>
                 `;
-                return;
-            }
+            return;
+        }
 
-            pacientes.forEach(p => {
-                const isSelected = p.id === selectedPatientId;
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                    isSelected 
-                        ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' 
-                        : 'bg-white border-gray-200/80 hover:border-forest-600/50 hover:bg-gray-50/50'
+        pacientes.forEach(p => {
+            const isSelected = p.id === selectedPatientId;
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSelected
+                    ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30'
+                    : 'bg-white border-gray-200/80 hover:border-forest-600/50 hover:bg-gray-50/50'
                 }`;
 
-                card.onclick = (e) => {
-                    if (!e.target.closest('button')) {
-                        selectPatient(p.id);
-                    }
-                };
+            card.onclick = (e) => {
+                if (!e.target.closest('button')) {
+                    selectPatient(p.id);
+                }
+            };
 
-                card.innerHTML = `
+            card.innerHTML = `
                     <div class="flex items-start space-x-3.5 min-w-0">
                         <div class="w-11 h-11 rounded-full ${p.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0 border border-black/5 shadow-2xs mt-0.5">
                             ${p.avatar}
@@ -482,30 +556,30 @@
                     </div>
                 `;
 
-                container.appendChild(card);
-            });
-        }
+            container.appendChild(card);
+        });
+    }
 
-        // SELECCIONAR Y MOSTRAR PERFIL COMPLETO EN EL PANEL DERECHO
-        function selectPatient(id) {
-            selectedPatientId = id;
-            renderPacientes();
+    // SELECCIONAR Y MOSTRAR PERFIL COMPLETO EN EL PANEL DERECHO
+    function selectPatient(id) {
+        selectedPatientId = id;
+        renderPacientes();
 
-            const p = pacientes.find(item => item.id === id);
-            const panel = document.getElementById('patient-preview-panel');
+        const p = pacientes.find(item => item.id === id);
+        const panel = document.getElementById('patient-preview-panel');
 
-            if (!p) return;
+        if (!p) return;
 
-            let recetasHtml = '';
-            if (p.recetas.length === 0) {
-                recetasHtml = `
+        let recetasHtml = '';
+        if (p.recetas.length === 0) {
+            recetasHtml = `
                     <div class="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-center">
                         <p class="text-xs text-gray-400">Sin recetas registradas.</p>
                     </div>
                 `;
-            } else {
-                p.recetas.forEach((receta) => {
-                    let medsRows = receta.medicaciones.map(m => `
+        } else {
+            p.recetas.forEach((receta) => {
+                let medsRows = receta.medicaciones.map(m => `
                         <tr class="border-b border-gray-100 text-[11px] hover:bg-gray-50/50">
                             <td class="py-2 font-bold text-gray-800">${m.farmaco}</td>
                             <td class="py-2 text-gray-700 font-mono">${m.dosis}</td>
@@ -521,16 +595,16 @@
                         ` : ''}
                     `).join('');
 
-                    const estadoBadgeClass = receta.estado === 'Activo' 
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
-                        : 'bg-rose-100 text-rose-800 border-rose-200';
+                const estadoBadgeClass = receta.estado === 'Activo'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-rose-100 text-rose-800 border-rose-200';
 
-                    recetasHtml += `
+                recetasHtml += `
                         <div class="bg-white rounded-xl border border-gray-200 p-3.5 space-y-2.5 shadow-2xs mb-3">
                             <div class="flex items-center justify-between border-b border-gray-100 pb-2">
                                 <div class="flex items-center space-x-1.5 text-xs text-forest-800 font-bold">
                                     <i class="fa-solid fa-receipt"></i>
-                                    <span>Receta N° ${receta.idReceta}</span>
+                                    <span>Receta N° ${receta.numero_receta}</span>
                                 </div>
                                 <span class="text-[10px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${receta.fecha}</span>
                             </div>
@@ -567,10 +641,10 @@
                             </div>
                         </div>
                     `;
-                });
-            }
+            });
+        }
 
-            panel.innerHTML = `
+        panel.innerHTML = `
                 <!-- Cabecera Paciente -->
                 <div class="text-center pb-4 border-b border-gray-100">
                     <div class="w-16 h-16 rounded-full ${p.avatarBg} font-bold text-xl flex items-center justify-center mx-auto mb-2 shadow-inner border border-black/5">
@@ -622,273 +696,279 @@
                     </div>
                 </div>
             `;
+    }
+
+    // ALTERNAR ESTADO DE LA RECETA (ACTIVO / VENCIDO)
+    function toggleEstadoReceta(patientId, recetaId) {
+        const p = pacientes.find(item => item.id === patientId);
+        if (!p) return;
+        const r = p.recetas.find(rec => rec.idReceta === recetaId);
+        if (!r) return;
+
+        r.estado = r.estado === 'Activo' ? 'Vencido' : 'Activo';
+        selectPatient(patientId);
+        showToast(`Estado de la Receta N° ${recetaId} actualizado a ${r.estado}.`);
+    }
+
+    // MODAL ALTA PACIENTE
+    function openNuevoPacienteModal() {
+        document.getElementById('form-nuevo-paciente').reset();
+        document.getElementById('modal-nuevo-paciente').classList.remove('hidden');
+    }
+
+    function saveNuevoPaciente() {
+        const nombre = document.getElementById('add-nombre').value.trim();
+        const apellido = document.getElementById('add-apellido').value.trim();
+        const dni = document.getElementById('add-dni').value.trim();
+        const fechaNac = document.getElementById('add-fecha_nacimiento').value;
+
+        if (!nombre || !apellido || !dni || !fechaNac) {
+            alert('Por favor complete los campos obligatorios (*).');
+            return;
         }
 
-        // ALTERNAR ESTADO DE LA RECETA (ACTIVO / VENCIDO)
-        function toggleEstadoReceta(patientId, recetaId) {
-            const p = pacientes.find(item => item.id === patientId);
-            if (!p) return;
-            const r = p.recetas.find(rec => rec.idReceta === recetaId);
-            if (!r) return;
+        const parts = fechaNac.split('-');
+        const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : fechaNac;
 
-            r.estado = r.estado === 'Activo' ? 'Vencido' : 'Activo';
-            selectPatient(patientId);
-            showToast(`Estado de la Receta N° ${recetaId} actualizado a ${r.estado}.`);
+        const newPatient = {
+            id: Date.now(),
+            nombre: nombre,
+            apellido: apellido,
+            dni: dni,
+            fecha_nacimiento: fechaNac,
+            fechaNacimientoDisplay: displayDate,
+            email: document.getElementById('add-email').value.trim(),
+            obra_social: document.getElementById('add-obra_social').value.trim(),
+            sexo_paciente: document.getElementById('add-sexo_paciente').value,
+            telefono: document.getElementById('add-telefono').value.trim(),
+            direccion: document.getElementById('add-direccion').value.trim(),
+            estado_paciente: document.getElementById('add-estado_paciente').value,
+            estadoBadge: document.getElementById('add-estado_paciente').value === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200",
+            diagnostico: document.getElementById('add-diagnostico').value.trim(),
+            sector: document.getElementById('add-sector').value,
+            habitacion: document.getElementById('add-habitacion').value,
+            cama: document.getElementById('add-cama').value.trim(),
+            avatar: (nombre[0] || '') + (apellido[0] || ''),
+            avatarBg: "bg-emerald-100 text-emerald-800",
+            recetas: []
+        };
+
+        pacientes.unshift(newPatient);
+        closeModal('modal-nuevo-paciente');
+        selectPatient(newPatient.id);
+        showToast(`Nuevo paciente ${nombre} ${apellido} registrado con éxito.`);
+    }
+
+    // MODAL EDICIÓN PACIENTE
+    function openEditModal(patientId) {
+        const p = pacientes.find(item => item.id === patientId);
+        if (!p) return;
+
+        // Asignar la URL de acción del formulario de edición dinámicamente
+        document.getElementById('form-editar-paciente').action = `/pacientes/${p.id}/editar/`;
+
+        document.getElementById('edit-patient-id').value = p.id;
+        document.getElementById('edit-nombre').value = p.nombre;
+        document.getElementById('edit-apellido').value = p.apellido;
+        document.getElementById('edit-dni').value = p.dni;
+        document.getElementById('edit-fecha_nacimiento').value = p.fecha_nacimiento;
+        document.getElementById('edit-email').value = p.email || '';
+        document.getElementById('edit-obra_social').value = p.obra_social;
+        document.getElementById('edit-sexo_paciente').value = p.sexo_paciente;
+        document.getElementById('edit-telefono').value = p.telefono;
+        document.getElementById('edit-direccion').value = p.direccion;
+        document.getElementById('edit-estado_paciente').value = p.estado_paciente;
+        // document.getElementById('edit-sector').value = p.sector;
+        // document.getElementById('edit-habitacion').value = p.habitacion;
+        // document.getElementById('edit-cama').value = p.cama;
+        document.getElementById('edit-diagnostico').value = p.diagnostico;
+
+        document.getElementById('modal-editar-paciente').classList.remove('hidden');
+    }
+
+    function savePatientEdit() {
+        const id = parseInt(document.getElementById('edit-patient-id').value);
+        const p = pacientes.find(item => item.id === id);
+        if (!p) return;
+
+        p.nombre = document.getElementById('edit-nombre').value.trim();
+        p.apellido = document.getElementById('edit-apellido').value.trim();
+        p.dni = document.getElementById('edit-dni').value.trim();
+        p.fecha_nacimiento = document.getElementById('edit-fecha_nacimiento').value;
+
+        const parts = p.fecha_nacimiento.split('-');
+        if (parts.length === 3) p.fechaNacimientoDisplay = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+        p.email = document.getElementById('edit-email').value.trim();
+        p.obra_social = document.getElementById('edit-obra_social').value.trim();
+        p.sexo_paciente = document.getElementById('edit-sexo_paciente').value;
+        p.telefono = document.getElementById('edit-telefono').value.trim();
+        p.direccion = document.getElementById('edit-direccion').value.trim();
+        p.estado_paciente = document.getElementById('edit-estado_paciente').value;
+        p.sector = document.getElementById('edit-sector').value;
+        p.habitacion = document.getElementById('edit-habitacion').value;
+        p.cama = document.getElementById('edit-cama').value.trim();
+        p.diagnostico = document.getElementById('edit-diagnostico').value.trim();
+
+        p.avatar = (p.nombre[0] || '') + (p.apellido[0] || '');
+        p.estadoBadge = p.estado_paciente === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200";
+
+        closeModal('modal-editar-paciente');
+        selectPatient(id);
+        showToast(`Ficha clínica de ${p.nombre} ${p.apellido} actualizada.`);
+    }
+
+    // FILAS DINÁMICAS Y MODAL RECETA
+    function addFarmacoRow(farmaco = '', dosis = '', via = 'Oral', frecuencia = 'Cada 8 hs', observaciones = '') {
+        const container = document.getElementById('farmacos-container');
+        const rowId = Date.now() + Math.random().toString(36).substring(2, 5);
+
+        const row = document.createElement('div');
+        row.id = `row-${rowId}`;
+        row.className = "bg-gray-50 border border-gray-200 p-3 rounded-xl space-y-2 relative";
+
+        row.innerHTML = `
+        <button type="button" onclick="removeFarmacoRow('row-${rowId}')" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 p-1 text-xs">
+            <i class="fa-solid fa-trash-can"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-6">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase">Fármaco *</label>
+                <!-- IMPORTANTE: name con corchetes para que Django reciba una lista -->
+                <input type="text" name="farmaco[]" placeholder="Ej: Paracetamol" value="${farmaco}" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase">Dosis *</label>
+                <input type="text" name="dosis[]" placeholder="Ej: 500 mg" value="${dosis}" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase">Vía *</label>
+                <select name="via[]" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
+                    <option value="Oral" ${via === 'Oral' ? 'selected' : ''}>Oral</option>
+                    <option value="Sublingual" ${via === 'Sublingual' ? 'selected' : ''}>Sublingual</option>
+                    <option value="Intramuscular" ${via === 'Intramuscular' ? 'selected' : ''}>Intramuscular</option>
+                    <option value="Endovenosa" ${via === 'Endovenosa' ? 'selected' : ''}>Endovenosa</option>
+                    <option value="Subcutánea" ${via === 'Subcutánea' ? 'selected' : ''}>Subcutánea</option>
+                    <option value="Tópica" ${via === 'Tópica' ? 'selected' : ''}>Tópica</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase">Frecuencia *</label>
+                <input type="text" name="frecuencia[]" placeholder="Ej: Cada 8 hs" value="${frecuencia}" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
+            </div>
+            <div class="col-span-2 md:col-span-1">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase">Observaciones</label>
+                <input type="text" name="observaciones[]" placeholder="Observaciones" value="${observaciones}" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
+            </div>
+        </div>
+    `;
+        container.appendChild(row);
+    }
+
+    function removeFarmacoRow(rowId) {
+        const row = document.getElementById(rowId);
+        if (row) row.remove();
+    }
+
+    function openRecetaModal(patientId) {
+        const p = pacientes.find(item => item.id === patientId);
+        if (!p) return;
+
+        selectedPatientId = patientId;
+        document.getElementById('receta-modal-paciente').innerText = `${p.nombre} ${p.apellido} (DNI: ${p.dni})`;
+
+        // Asignar dinámicamente la ruta de Django para guardar la receta de este paciente
+        document.getElementById('form-receta').action = `/pacientes/${p.id}/recetas/crear/`;
+
+        document.getElementById('farmacos-container').innerHTML = '';
+        addFarmacoRow('Paracetamol', '500 mg', 'Oral', 'Cada 8 hs', 'Sin observaciones');  // dejar la funcion en blanco
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('receta-fecha').value = today;
+        document.getElementById('modal-receta').classList.remove('hidden');
+    }
+
+    function saveReceta() {
+        const p = pacientes.find(item => item.id === selectedPatientId);
+        if (!p) return;
+
+        const nroReceta = parseInt(document.getElementById('receta-numero').value) || Math.floor(Math.random() * 9000);
+        const medico = document.getElementById('receta-medico').value.trim() || "Dr. Desconocido";
+        const fechaRaw = document.getElementById('receta-fecha').value;
+        let fechaFormatted = "14/08/2026";
+        if (fechaRaw) {
+            const parts = fechaRaw.split('-');
+            if (parts.length === 3) fechaFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
-        // MODAL ALTA PACIENTE
-        function openNuevoPacienteModal() {
-            document.getElementById('form-nuevo-paciente').reset();
-            document.getElementById('modal-nuevo-paciente').classList.remove('hidden');
-        }
+        const farmacoRows = document.querySelectorAll('#farmacos-container > div');
+        const medicaciones = [];
 
-        function saveNuevoPaciente() {
-            const nombre = document.getElementById('add-nombre').value.trim();
-            const apellido = document.getElementById('add-apellido').value.trim();
-            const dni = document.getElementById('add-dni').value.trim();
-            const fechaNac = document.getElementById('add-fecha_nacimiento').value;
+        farmacoRows.forEach(row => {
+            const name = row.querySelector('.farmaco-name').value.trim();
+            const dosis = row.querySelector('.farmaco-dosis').value.trim();
+            const via = row.querySelector('.farmaco-via').value;
+            const frecuencia = row.querySelector('.farmaco-frecuencia').value.trim();
+            const observaciones = row.querySelector('.farmaco-obs').value.trim();
 
-            if (!nombre || !apellido || !dni || !fechaNac) {
-                alert('Por favor complete los campos obligatorios (*).');
-                return;
+            if (name && dosis) {
+                medicaciones.push({ farmaco: name, dosis: dosis, via: via, frecuencia: frecuencia, observaciones: observaciones || '--' });
             }
+        });
 
-            const parts = fechaNac.split('-');
-            const displayDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : fechaNac;
-
-            const newPatient = {
-                id: Date.now(),
-                nombre: nombre,
-                apellido: apellido,
-                dni: dni,
-                fecha_nacimiento: fechaNac,
-                fechaNacimientoDisplay: displayDate,
-                email: document.getElementById('add-email').value.trim(),
-                obra_social: document.getElementById('add-obra_social').value.trim(),
-                sexo_paciente: document.getElementById('add-sexo_paciente').value,
-                telefono: document.getElementById('add-telefono').value.trim(),
-                direccion: document.getElementById('add-direccion').value.trim(),
-                estado_paciente: document.getElementById('add-estado_paciente').value,
-                estadoBadge: document.getElementById('add-estado_paciente').value === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200",
-                diagnostico: document.getElementById('add-diagnostico').value.trim(),
-                sector: document.getElementById('add-sector').value,
-                habitacion: document.getElementById('add-habitacion').value,
-                cama: document.getElementById('add-cama').value.trim(),
-                avatar: (nombre[0] || '') + (apellido[0] || ''),
-                avatarBg: "bg-emerald-100 text-emerald-800",
-                recetas: []
-            };
-
-            pacientes.unshift(newPatient);
-            closeModal('modal-nuevo-paciente');
-            selectPatient(newPatient.id);
-            showToast(`Nuevo paciente ${nombre} ${apellido} registrado con éxito.`);
+        if (medicaciones.length === 0) {
+            alert('Debe ingresar al menos un fármaco.');
+            return;
         }
 
-        // MODAL EDICIÓN PACIENTE
-        function openEditModal(patientId) {
-            const p = pacientes.find(item => item.id === patientId);
-            if (!p) return;
+        p.recetas.unshift({
+            idReceta: nroReceta,
+            fecha: fechaFormatted,
+            medico: medico,
+            estado: "Activo",
+            medicaciones: medicaciones
+        });
 
-            // Asignar la URL de acción del formulario de edición dinámicamente
-            document.getElementById('form-editar-paciente').action = `/pacientes/${p.id}/editar/`;
+        closeModal('modal-receta');
+        selectPatient(p.id);
+        showToast(`Receta N° ${nroReceta} guardada correctamente.`);
+    }
 
-            document.getElementById('edit-patient-id').value = p.id;
-            document.getElementById('edit-nombre').value = p.nombre;
-            document.getElementById('edit-apellido').value = p.apellido;
-            document.getElementById('edit-dni').value = p.dni;
-            document.getElementById('edit-fecha_nacimiento').value = p.fecha_nacimiento;
-            document.getElementById('edit-email').value = p.email || '';
-            document.getElementById('edit-obra_social').value = p.obra_social;
-            document.getElementById('edit-sexo_paciente').value = p.sexo_paciente;
-            document.getElementById('edit-telefono').value = p.telefono;
-            document.getElementById('edit-direccion').value = p.direccion;
-            document.getElementById('edit-estado_paciente').value = p.estado_paciente;
-            // document.getElementById('edit-sector').value = p.sector;
-            // document.getElementById('edit-habitacion').value = p.habitacion;
-            // document.getElementById('edit-cama').value = p.cama;
-            document.getElementById('edit-diagnostico').value = p.diagnostico;
+    function filterPacientes() {
+        const query = document.getElementById('search-patient').value.toLowerCase();
+        const container = document.getElementById('pacientes-container');
+        container.innerHTML = '';
 
-            document.getElementById('modal-editar-paciente').classList.remove('hidden');
-        }
+        const filtered = pacientes.filter(p =>
+            p.nombre.toLowerCase().includes(query) ||
+            p.apellido.toLowerCase().includes(query) ||
+            p.dni.toLowerCase().includes(query) ||
+            p.cama.toLowerCase().includes(query) ||
+            p.sector.toLowerCase().includes(query)
+        );
 
-        function savePatientEdit() {
-            const id = parseInt(document.getElementById('edit-patient-id').value);
-            const p = pacientes.find(item => item.id === id);
-            if (!p) return;
-
-            p.nombre = document.getElementById('edit-nombre').value.trim();
-            p.apellido = document.getElementById('edit-apellido').value.trim();
-            p.dni = document.getElementById('edit-dni').value.trim();
-            p.fecha_nacimiento = document.getElementById('edit-fecha_nacimiento').value;
-            
-            const parts = p.fecha_nacimiento.split('-');
-            if (parts.length === 3) p.fechaNacimientoDisplay = `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-            p.email = document.getElementById('edit-email').value.trim();
-            p.obra_social = document.getElementById('edit-obra_social').value.trim();
-            p.sexo_paciente = document.getElementById('edit-sexo_paciente').value;
-            p.telefono = document.getElementById('edit-telefono').value.trim();
-            p.direccion = document.getElementById('edit-direccion').value.trim();
-            p.estado_paciente = document.getElementById('edit-estado_paciente').value;
-            p.sector = document.getElementById('edit-sector').value;
-            p.habitacion = document.getElementById('edit-habitacion').value;
-            p.cama = document.getElementById('edit-cama').value.trim();
-            p.diagnostico = document.getElementById('edit-diagnostico').value.trim();
-
-            p.avatar = (p.nombre[0] || '') + (p.apellido[0] || '');
-            p.estadoBadge = p.estado_paciente === 'Internado' ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-blue-100 text-blue-800 border-blue-200";
-
-            closeModal('modal-editar-paciente');
-            selectPatient(id);
-            showToast(`Ficha clínica de ${p.nombre} ${p.apellido} actualizada.`);
-        }
-
-        // FILAS DINÁMICAS Y MODAL RECETA
-        function addFarmacoRow(farmaco = '', dosis = '', via = 'Oral', frecuencia = 'Cada 8 hs', observaciones = '') {
-            const container = document.getElementById('farmacos-container');
-            const rowId = Date.now() + Math.random().toString(36).substring(2, 5);
-
-            const row = document.createElement('div');
-            row.id = `row-${rowId}`;
-            row.className = "bg-gray-50 border border-gray-200 p-3 rounded-xl space-y-2 relative";
-
-            row.innerHTML = `
-                <button type="button" onclick="removeFarmacoRow('row-${rowId}')" class="absolute top-2 right-2 text-rose-500 hover:text-rose-700 p-1 text-xs">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pr-6">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Fármaco *</label>
-                        <input type="text" placeholder="Ej: Paracetamol" value="${farmaco}" class="farmaco-name w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Dosis *</label>
-                        <input type="text" placeholder="Ej: 500 mg" value="${dosis}" class="farmaco-dosis w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Vía *</label>
-                        <select class="farmaco-via w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                            <option value="Oral" ${via === 'Oral' ? 'selected' : ''}>Oral</option>
-                            <option value="Sublingual" ${via === 'Sublingual' ? 'selected' : ''}>Sublingual</option>
-                            <option value="Intramuscular" ${via === 'Intramuscular' ? 'selected' : ''}>Intramuscular</option>
-                            <option value="Endovenosa" ${via === 'Endovenosa' ? 'selected' : ''}>Endovenosa</option>
-                            <option value="Subcutánea" ${via === 'Subcutánea' ? 'selected' : ''}>Subcutánea</option>
-                            <option value="Tópica" ${via === 'Tópica' ? 'selected' : ''}>Tópica</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Frecuencia *</label>
-                        <input type="text" placeholder="Ej: Cada 8 hs" value="${frecuencia}" class="farmaco-frecuencia w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                    </div>
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Observaciones</label>
-                        <input type="text" placeholder="Observaciones" value="${observaciones}" class="farmaco-obs w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none">
-                    </div>
-                </div>
-            `;
-            container.appendChild(row);
-        }
-
-        function removeFarmacoRow(rowId) {
-            const row = document.getElementById(rowId);
-            if (row) row.remove();
-        }
-
-        function openRecetaModal(patientId) {
-            const p = pacientes.find(item => item.id === patientId);
-            if (!p) return;
-
-            selectedPatientId = patientId;
-            document.getElementById('receta-modal-paciente').innerText = `${p.nombre} ${p.apellido} (DNI: ${p.dni})`;
-            
-            document.getElementById('farmacos-container').innerHTML = '';
-            addFarmacoRow('Paracetamol', '500 mg', 'Oral', 'Cada 8 hs', 'Sin observaciones');
-            document.getElementById('modal-receta').classList.remove('hidden');
-        }
-
-        function saveReceta() {
-            const p = pacientes.find(item => item.id === selectedPatientId);
-            if (!p) return;
-
-            const nroReceta = parseInt(document.getElementById('receta-numero').value) || Math.floor(Math.random() * 9000);
-            const medico = document.getElementById('receta-medico').value.trim() || "Dr. Desconocido";
-            const fechaRaw = document.getElementById('receta-fecha').value;
-            let fechaFormatted = "14/08/2026";
-            if (fechaRaw) {
-                const parts = fechaRaw.split('-');
-                if(parts.length === 3) fechaFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-
-            const farmacoRows = document.querySelectorAll('#farmacos-container > div');
-            const medicaciones = [];
-
-            farmacoRows.forEach(row => {
-                const name = row.querySelector('.farmaco-name').value.trim();
-                const dosis = row.querySelector('.farmaco-dosis').value.trim();
-                const via = row.querySelector('.farmaco-via').value;
-                const frecuencia = row.querySelector('.farmaco-frecuencia').value.trim();
-                const observaciones = row.querySelector('.farmaco-obs').value.trim();
-
-                if (name && dosis) {
-                    medicaciones.push({ farmaco: name, dosis: dosis, via: via, frecuencia: frecuencia, observaciones: observaciones || '--' });
-                }
-            });
-
-            if (medicaciones.length === 0) {
-                alert('Debe ingresar al menos un fármaco.');
-                return;
-            }
-
-            p.recetas.unshift({
-                idReceta: nroReceta,
-                fecha: fechaFormatted,
-                medico: medico,
-                estado: "Activo",
-                medicaciones: medicaciones
-            });
-
-            closeModal('modal-receta');
-            selectPatient(p.id);
-            showToast(`Receta N° ${nroReceta} guardada correctamente.`);
-        }
-
-        function filterPacientes() {
-            const query = document.getElementById('search-patient').value.toLowerCase();
-            const container = document.getElementById('pacientes-container');
-            container.innerHTML = '';
-
-            const filtered = pacientes.filter(p => 
-                p.nombre.toLowerCase().includes(query) ||
-                p.apellido.toLowerCase().includes(query) ||
-                p.dni.toLowerCase().includes(query) ||
-                p.cama.toLowerCase().includes(query) ||
-                p.sector.toLowerCase().includes(query)
-            );
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
+        if (filtered.length === 0) {
+            container.innerHTML = `
                     <div class="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                         <p class="text-xs text-gray-400">Sin coincidencias para "${query}".</p>
                     </div>
                 `;
-                return;
-            }
+            return;
+        }
 
-            filtered.forEach(p => {
-                const isSelected = p.id === selectedPatientId;
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                    isSelected ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' : 'bg-white border-gray-200/80'
+        filtered.forEach(p => {
+            const isSelected = p.id === selectedPatientId;
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${isSelected ? 'bg-forest-50/70 border-forest-600/80 shadow-xs ring-1 ring-forest-600/30' : 'bg-white border-gray-200/80'
                 }`;
 
-                card.onclick = (e) => {
-                    if (!e.target.closest('button')) selectPatient(p.id);
-                };
+            card.onclick = (e) => {
+                if (!e.target.closest('button')) selectPatient(p.id);
+            };
 
-                card.innerHTML = `
+            card.innerHTML = `
                     <div class="flex items-start space-x-3.5 min-w-0">
                         <div class="w-11 h-11 rounded-full ${p.avatarBg} font-bold text-sm flex items-center justify-center flex-shrink-0">
                             ${p.avatar}
@@ -902,23 +982,23 @@
                         <button onclick="openEditModal(${p.id})" class="p-2 text-gray-500 hover:text-forest-800 border rounded-lg"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
                     </div>
                 `;
-                container.appendChild(card);
-            });
-        }
+            container.appendChild(card);
+        });
+    }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3500);
-        }
-    </script>
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = message;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3500);
+    }
+</script>
 {% endblock %}
