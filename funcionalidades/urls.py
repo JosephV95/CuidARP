@@ -17,14 +17,12 @@ urlpatterns = [
     path('cama/<int:cama_id>/liberar/', views.liberar_cama_view, name='liberar_cama'),
     path('cama/<int:cama_id>/asignar/', views.asignar_paciente_view, name='asignar_paciente'),
 
-    path('planillas/', views.mostrar_planillas, name='gestion_planillas'),
-    
+    # Rutas para el login, logout y registro de usuarios
     path('login/', views.mostrar_login_usuario, name='login_usuario'),
     path('logout/', views.cerrar_sesion, name='cerrar_sesion'),
     path('registro/', views.mostrar_registro_usuario, name='registro_usuario'),
     
     #Rutas planillas
-    
     path('planillas/', views.mostrar_planillas, name='gestion_planillas'),
     path('planillas/<int:paciente_id>/', views.mostrar_planillas, name='gestion_planillas'),
     path('planillas/paciente/<int:paciente_id>/guardar/', views.guardar_administracion, name='guardar_administracion'),
