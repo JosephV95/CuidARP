@@ -182,3 +182,84 @@ class Cama(models.Model):
         f'{self.nombre} - Hab. {self.habitacion.nombre}'
         f' ({self.habitacion.sector.nombre})'
     )
+    
+    
+    
+    #PRUEBAS PLANILLAS
+    
+    # *---- Modelo de la tabla Receta y sus Fármacos
+class Receta(models.Model):
+    ESTADO_CHOICES = [
+        ('Activo', 'Activo'),
+        ('Vencido', 'Vencido'),
+    ]
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.CASCADE,
+        related_name='recetas',
+        verbose_name='Paciente'
+    )
+    numero_receta = models.CharField(max_length=50, verbose_name='Número de Receta')
+    medico_prescriptor = models.CharField(max_length=100, verbose_name='Médico Prescriptor')
+    fecha = models.DateField(verbose_name='Fecha de Prescripción')
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADO_CHOICES,
+        default='Activo',
+        verbose_name='Estado de Receta'
+    )
+
+    def __str__(self):
+        return f"Receta N° {self.numero_receta} - {self.paciente.apellido}"
+
+
+class MedicacionReceta(models.Model):
+    VIA_CHOICES = [
+        ('Oral', 'Oral'),
+        ('Sublingual', 'Sublingual'),
+        ('Intramuscular', 'Intramuscular'),
+        ('Endovenosa', 'Endovenosa'),
+        ('Subcutánea', 'Subcutánea'),
+        ('Tópica', 'Tópica'),
+    ]
+    receta = models.ForeignKey(
+        Receta,
+        on_delete=models.CASCADE,
+        related_name='medicaciones',
+        verbose_name='Receta'
+    )
+    farmaco = models.CharField(max_length=100, verbose_name='Fármaco')
+    dosis = models.CharField(max_length=50, verbose_name='Dosis')
+    via = models.CharField(max_length=30, choices=VIA_CHOICES, verbose_name='Vía de Administración')
+    frecuencia = models.CharField(max_length=50, verbose_name='Frecuencia')
+    observaciones = models.TextField(blank=True, null=True, verbose_name='Observaciones')
+
+    def __str__(self):
+        return f"{self.farmaco} ({self.dosis}) - Receta {self.receta.numero_receta}"
+
+
+# *---- Modelo de la tabla Planilla de Administración
+class RegistroAdministracion(models.Model):
+    paciente = models.ForeignKey(
+        Paciente,
+        on_delete=models.CASCADE,
+        related_name='administraciones',
+        verbose_name='Paciente'
+    )
+    receta = models.ForeignKey(
+        Receta,
+        on_delete=models.PROTECT,  # Impide borrar una receta si ya tiene administraciones registradas
+        verbose_name='Receta Aplicada'
+    )
+    enfermero = models.ForeignKey(
+        Enfermero,
+        on_delete=models.PROTECT,  # Mantiene el historial del enfermero por auditoría médica
+        verbose_name='Enfermero Responsable'
+    )
+    fecha = models.DateField(verbose_name='Fecha de Administración')
+    horarios = models.JSONField(default=list, verbose_name='Horarios Administrados')
+    observaciones = models.TextField(blank=True, null=True, verbose_name='Observaciones')
+    fecha_registro = models.DateTimeField(auto_now_add=True, verbose_name='Timestamp de Firma')
+
+    def __str__(self):
+        return f"{self.fecha} | {self.paciente.apellido} - Firmado por {self.enfermero.matricula}"

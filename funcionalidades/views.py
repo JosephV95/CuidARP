@@ -342,3 +342,108 @@ def asignar_paciente_view(request, cama_id):
 def mostrar_planillas(request):
     return render(request, 'Planillas.html')
 
+
+
+#PRUEBAS PLANILLAS 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Paciente, Receta, RegistroAdministracion, Enfermero
+
+def mostrar_planillas(request, paciente_id=None):
+    # Si ingresan a /planillas/ sin ID, seleccionamos el primer paciente disponible automáticamente
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+    else:
+        paciente = Paciente.objects.first()
+        
+    # Si de plano no hay ningún paciente registrado en la base de datos todavía
+    if not paciente:
+        messages.warning(request, "Debe registrar al menos un paciente para ver las planillas.")
+        return redirect('gestion_pacientes') # O a la vista que prefieras
+
+    # Obtener las recetas activas exclusivamente de este paciente
+    recetas = Receta.objects.filter(paciente=paciente, estado='Activo')
+    recetas_json = [
+        {'id': r.id, 'numero_receta': r.numero_receta} 
+        for r in recetas
+    ]
+    
+    # Obtener los registros de administración de este paciente
+    registros = RegistroAdministracion.objects.filter(paciente=paciente).order_by('-fecha', '-id')
+    registros_json = [
+        {
+            'id': reg.id,
+            'fecha': reg.fecha.strftime('%d/%m/%Y'),
+            'numero_receta': reg.receta.numero_receta,
+            'horarios': reg.horarios,
+            'observaciones': reg.observaciones or '',
+            'enfermero_nombre': f"{reg.enfermero.nombre} {reg.enfermero.apellido}",
+            'enfermero_matricula': reg.enfermero.matricula,
+        }
+        for reg in registros
+    ]
+
+    return render(request, 'Planillas.html', {
+        'paciente': paciente,
+        'recetas_paciente_json': recetas_json,
+        'registros_json': registros_json,
+    })
+    
+    from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Paciente, Enfermero, RegistroAdministracion
+
+def guardar_administracion(request, paciente_id):
+    if request.method == 'POST':
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        pin_ingresado = request.POST.get('pin_ingresado', '').strip()
+        
+        # Validar el PIN contra los enfermeros activos y verificados
+        enfermero_firmante = None
+        for enf in Enfermero.objects.filter(activo=True, verificado=True):
+            if enf.pin_sello == pin_ingresado:
+                enfermero_firmante = enf
+                break
+
+        if not enfermero_firmante:
+            messages.error(request, "PIN incorrecto o no pertenece a un enfermero habilitado.")
+            return redirect('gestion_planillas')
+
+        horarios_lista = request.POST.getlist('horarios')
+        receta_id = request.POST.get('receta_id')
+        fecha = request.POST.get('fecha')
+        observaciones = request.POST.get('observaciones', '')
+
+        RegistroAdministracion.objects.create(
+            paciente=paciente,
+            receta_id=receta_id,
+            fecha=fecha,
+            horarios=horarios_lista,
+            observaciones=observaciones,
+            enfermero=enfermero_firmante
+        )
+        
+        messages.success(request, f"Administración registrada y firmada por {enfermero_firmante.nombre} {enfermero_firmante.apellido}.")
+        return redirect('gestion_planillas')
+
+
+def eliminar_administracion(request, registro_id):
+    if request.method == 'POST':
+        registro = get_object_or_404(RegistroAdministracion, id=registro_id)
+        pin_ingresado = request.POST.get('pin_ingresado', '').strip()
+        
+        # Validar el PIN para autorizar la eliminación
+        enfermero_autorizado = None
+        for enf in Enfermero.objects.filter(activo=True, verificado=True):
+            if enf.pin_sello == pin_ingresado:
+                enfermero_autorizado = enf
+                break
+
+        if not enfermero_autorizado:
+            messages.error(request, "PIN incorrecto. No se pudo autorizar la eliminación.")
+            return redirect('gestion_planillas')
+
+        registro.delete()
+        messages.success(request, "El registro de administración ha sido eliminado correctamente.")
+        return redirect('gestion_planillas')
+    

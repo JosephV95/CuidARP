@@ -22,4 +22,12 @@ urlpatterns = [
     path('login/', views.mostrar_login_usuario, name='login_usuario'),
     path('logout/', views.cerrar_sesion, name='cerrar_sesion'),
     path('registro/', views.mostrar_registro_usuario, name='registro_usuario'),
+    
+    #Rutas planillas
+    
+    path('planillas/', views.mostrar_planillas, name='gestion_planillas'),
+    path('planillas/<int:paciente_id>/', views.mostrar_planillas, name='gestion_planillas'),
+    path('planillas/paciente/<int:paciente_id>/guardar/', views.guardar_administracion, name='guardar_administracion'),
+    path('planillas/registro/<int:registro_id>/eliminar/', views.eliminar_administracion, name='eliminar_administracion'),
+    
 ]
