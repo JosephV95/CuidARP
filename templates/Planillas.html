@@ -64,7 +64,7 @@
 
                     <div class="flex items-center space-x-3">
                         <button type="button" id="btn-agregar-fila" onclick="desplegarNuevaFila()"
-                                class="bg-cyan-950 hover:bg-cyan-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                                class="bg-emerald-800 hover:bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
                             <i class="fa-solid fa-plus text-xs"></i>
                             <span>Agregar Administración</span>
                         </button>
@@ -306,7 +306,7 @@
                         Cancelar
                     </button>
                     <button type="button" onclick="solicitarPinGuardar()"
-                            class="px-3.5 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-[11px] rounded-lg shadow-xs transition-colors">
+                            class="px-3.5 py-1.5 bg-blue-800 hover:bg-blue-700 text-white font-semibold text-[11px] rounded-lg shadow-xs transition-colors">
                         Guardar
                     </button>
                 </div>
@@ -337,10 +337,10 @@
         }
 
         accionPendiente = 'guardar';
-        document.getElementById('modal-pin-header').className = "bg-forest-800 text-white p-4 flex items-center justify-between";
+        document.getElementById('modal-pin-header').className = "bg-cyan-900 text-white p-4 flex items-center justify-between";
         document.getElementById('modal-pin-titulo').innerText = "Firmar y Guardar Administración";
         document.getElementById('modal-pin-descripcion').innerText = "Ingrese su PIN personal de 4 dígitos. Su nombre y matrícula quedarán registrados como responsable.";
-        document.getElementById('btn-confirmar-pin').className = "px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors";
+        document.getElementById('btn-confirmar-pin').className = "px-4 py-2 bg-teal-800 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition-colors";
         document.getElementById('btn-confirmar-pin').innerText = "Firmar y Guardar";
         abrirModalPin();
     }
