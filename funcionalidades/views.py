@@ -339,8 +339,8 @@ def asignar_paciente_view(request, cama_id):
 
 
 
-def mostrar_planillas(request):
-    return render(request, 'Planillas.html')
+# def mostrar_planillas(request):
+#     return render(request, 'Planillas.html')
 
 
 
@@ -389,61 +389,73 @@ def mostrar_planillas(request, paciente_id=None):
         'registros_json': registros_json,
     })
     
-    from django.shortcuts import get_object_or_404, redirect
+    
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from .models import Paciente, Enfermero, RegistroAdministracion
 
 def guardar_administracion(request, paciente_id):
-    if request.method == 'POST':
-        paciente = get_object_or_404(Paciente, id=paciente_id)
-        pin_ingresado = request.POST.get('pin_ingresado', '').strip()
-        
-        # Validar el PIN contra los enfermeros activos y verificados
-        enfermero_firmante = None
-        for enf in Enfermero.objects.filter(activo=True, verificado=True):
-            if enf.pin_sello == pin_ingresado:
-                enfermero_firmante = enf
-                break
+  if request.method == 'POST':
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    pin_ingresado = request.POST.get('pin_ingresado', '').strip()
 
-        if not enfermero_firmante:
-            messages.error(request, "PIN incorrecto o no pertenece a un enfermero habilitado.")
-            return redirect('gestion_planillas')
+    enfermero_firmante = None
+    for enf in Enfermero.objects.filter(activo=True, verificado=True):
+      if enf.pin_sello == pin_ingresado:
+        enfermero_firmante = enf
+        break
 
-        horarios_lista = request.POST.getlist('horarios')
-        receta_id = request.POST.get('receta_id')
-        fecha = request.POST.get('fecha')
-        observaciones = request.POST.get('observaciones', '')
+    if not enfermero_firmante:
+      messages.error(
+          request, 'PIN incorrecto o no pertenece a un enfermero habilitado.'
+      )
+      return redirect('gestion_planillas', paciente_id=paciente.id)
 
-        RegistroAdministracion.objects.create(
-            paciente=paciente,
-            receta_id=receta_id,
-            fecha=fecha,
-            horarios=horarios_lista,
-            observaciones=observaciones,
-            enfermero=enfermero_firmante
-        )
-        
-        messages.success(request, f"Administración registrada y firmada por {enfermero_firmante.nombre} {enfermero_firmante.apellido}.")
-        return redirect('gestion_planillas')
+    horarios_lista = request.POST.getlist('horarios')
+    receta_id = request.POST.get('receta_id')
+    fecha = request.POST.get('fecha')
+    observaciones = request.POST.get('observaciones', '')
+
+    RegistroAdministracion.objects.create(
+        paciente=paciente,
+        receta_id=receta_id,
+        fecha=fecha,
+        horarios=horarios_lista,
+        observaciones=observaciones,
+        enfermero=enfermero_firmante,
+    )
+
+    messages.success(
+        request,
+        f'Administración registrada y firmada por {enfermero_firmante.nombre}'
+        f' {enfermero_firmante.apellido}.',
+    )
+    return redirect('gestion_planillas', paciente_id=paciente.id)
 
 
 def eliminar_administracion(request, registro_id):
-    if request.method == 'POST':
-        registro = get_object_or_404(RegistroAdministracion, id=registro_id)
-        pin_ingresado = request.POST.get('pin_ingresado', '').strip()
-        
-        # Validar el PIN para autorizar la eliminación
-        enfermero_autorizado = None
-        for enf in Enfermero.objects.filter(activo=True, verificado=True):
-            if enf.pin_sello == pin_ingresado:
-                enfermero_autorizado = enf
-                break
+  if request.method == 'POST':
+    registro = get_object_or_404(RegistroAdministracion, id=registro_id)
+    paciente_id = registro.paciente.id  # Rescatamos el ID antes de borrar
 
-        if not enfermero_autorizado:
-            messages.error(request, "PIN incorrecto. No se pudo autorizar la eliminación.")
-            return redirect('gestion_planillas')
+    pin_ingresado = request.POST.get('pin_ingresado', '').strip()
 
-        registro.delete()
-        messages.success(request, "El registro de administración ha sido eliminado correctamente.")
-        return redirect('gestion_planillas')
+    enfermero_autorizado = None
+    for enf in Enfermero.objects.filter(activo=True, verificado=True):
+      if enf.pin_sello == pin_ingresado:
+        enfermero_autorizado = enf
+        break
+
+    if not enfermero_autorizado:
+      messages.error(
+          request, 'PIN incorrecto. No se pudo autorizar la eliminación.'
+      )
+      return redirect('gestion_planillas', paciente_id=paciente_id)
+
+    registro.delete()
+    messages.success(
+        request,
+        'El registro de administración ha sido eliminado correctamente.',
+    )
+    return redirect('gestion_planillas', paciente_id=paciente_id)
     
