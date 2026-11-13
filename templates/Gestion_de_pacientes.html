@@ -122,7 +122,7 @@
                 </button>
             </div>
 
-            <form id="form-nuevo-paciente" method="POST" action="">
+            <form id="form-nuevo-paciente" method="POST" action="{% url 'crear_paciente' %}">
                 {% csrf_token %}
                 <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
                     <div class="grid grid-cols-2 gap-3">
@@ -188,41 +188,7 @@
                     </div>
 
                     <!-- ASIGNACIÓN DE UBICACIÓN -->
-                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-3">
-                        <span class="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">Asignación de Ubicación</span>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Sector *</label>
-                                <select id="add-sector" name="sector" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                                    <option value="Sector Varones">Sector Varones</option>
-                                    <option value="Sector Mujeres">Sector Mujeres</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Habitación *</label>
-                                <select id="add-habitacion" name="habitacion" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                                    <option value="1">Hab. 01</option>
-                                    <option value="2">Hab. 02</option>
-                                    <option value="3">Hab. 03</option>
-                                    <option value="4">Hab. 04</option>
-                                    <option value="5">Hab. 05</option>
-                                    <option value="6">Hab. 06</option>
-                                    <option value="7">Hab. 07</option>
-                                    <option value="8">Hab. 08</option>
-                                    <option value="9">Hab. 09</option>
-                                    <option value="10">Hab. 10</option>
-                                    <option value="11">Hab. 11</option>
-                                    <option value="12">Hab. 12</option>
-                                    <option value="13">Hab. 13</option>
-                                    <option value="14">Hab. 14</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Cama *</label>
-                                <input type="text" id="add-cama" name="cama" placeholder="Ej: Cama 02" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
@@ -234,7 +200,7 @@
                     <button type="button" onclick="closeModal('modal-nuevo-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
                         Cancelar
                     </button>
-                    <button type="button" onclick="saveNuevoPaciente()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                    <button type="submit" onclick="saveNuevoPaciente()" class="px-5 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
                         <i class="fa-solid fa-check"></i>
                         <span>Guardar Paciente</span>
                     </button>
@@ -329,42 +295,7 @@
                         </div>
                     </div>
 
-                    <!-- UBICACIÓN DE EDICIÓN -->
-                    <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200 space-y-3">
-                        <span class="text-[11px] font-bold text-gray-700 uppercase tracking-wider block">Ubicación de Internación</span>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Sector *</label>
-                                <select id="edit-sector" name="sector" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                                    <option value="Sector Varones">Sector Varones</option>
-                                    <option value="Sector Mujeres">Sector Mujeres</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Habitación *</label>
-                                <select id="edit-habitacion" name="habitacion" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                                    <option value="1">Hab. 01</option>
-                                    <option value="2">Hab. 02</option>
-                                    <option value="3">Hab. 03</option>
-                                    <option value="4">Hab. 04</option>
-                                    <option value="5">Hab. 05</option>
-                                    <option value="6">Hab. 06</option>
-                                    <option value="7">Hab. 07</option>
-                                    <option value="8">Hab. 08</option>
-                                    <option value="9">Hab. 09</option>
-                                    <option value="10">Hab. 10</option>
-                                    <option value="11">Hab. 11</option>
-                                    <option value="12">Hab. 12</option>
-                                    <option value="13">Hab. 13</option>
-                                    <option value="14">Hab. 14</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Cama *</label>
-                                <input type="text" id="edit-cama" name="cama" class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg focus:outline-none" required>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Diagnóstico *</label>
@@ -376,7 +307,7 @@
                     <button type="button" onclick="closeModal('modal-editar-paciente')" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
                         Cancelar
                     </button>
-                    <button type="button" onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
+                    <button type="submit" onclick="savePatientEdit()" class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors flex items-center space-x-1.5 shadow-xs">
                         <i class="fa-solid fa-check"></i>
                         <span>Guardar Cambios</span>
                     </button>
@@ -417,7 +348,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">N° de Receta *</label>
-                            <input type="number" id="receta-numero" name="numero_receta" placeholder="Ej: 1042" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
+                            <input type="text" id="receta-numero" name="numero_receta" placeholder="Ej: 1042" class="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none" required>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 mb-1">Médico prescriptor *</label>
@@ -466,78 +397,13 @@
         <span id="toast-msg">Acción realizada con éxito</span>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT CON CAMPOS EXACTOS DE MODELS.PY -->
+    <!-- DATOS DE PACIENTES EN FORMATO JSON -->
+     {{ pacientes_list|json_script:"pacientes-data" }}
+
     <script>
         // ESTRUCTURA DE PACIENTES ADAPTADA AL MODELO DJANGO (models.py)
-        let pacientes = [
-            {
-                id: 101,
-                nombre: "Gonzalo",
-                apellido: "Fernández",
-                dni: "29405122",
-                fecha_nacimiento: "1982-03-12",
-                fechaNacimientoDisplay: "12/03/1982",
-                email: "g.fernandez@correo.com",
-                obra_social: "PAMI / Incluir Salud",
-                sexo_paciente: "Masculino",
-                telefono: "261458963",
-                direccion: "San Martín 450, Mendoza",
-                estado_paciente: "Internado",
-                estadoBadge: "bg-emerald-100 text-emerald-800 border-emerald-200",
-                diagnostico: "Episodio Maníaco Agudo con Síntomas Psicóticos (F31.2)",
-                sector: "Sector Varones",
-                habitacion: "02",
-                cama: "Cama 12",
-                avatar: "GF",
-                avatarBg: "bg-sky-100 text-sky-800",
-                recetas: [
-                    {
-                        idReceta: 1001,
-                        fecha: "10/08/2026",
-                        medico: "Dr. Roberto Arlt",
-                        estado: "Activo",
-                        medicaciones: [
-                            { farmaco: "Haloperidol", dosis: "5 mg", via: "Oral", frecuencia: "Cada 12 hs", observaciones: "Acompañar con alimentos" },
-                            { farmaco: "Clonazepam", dosis: "2 mg", via: "Sublingual", frecuencia: "SOS", observaciones: "Caso de agitación" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 102,
-                nombre: "Valentina",
-                apellido: "Rossi",
-                dni: "38109822",
-                fecha_nacimiento: "1994-11-05",
-                fechaNacimientoDisplay: "05/11/1994",
-                email: "",
-                obra_social: "OSEP Mendoza",
-                sexo_paciente: "Femenino",
-                telefono: "261789412",
-                direccion: "Belgrano 1200, Godoy Cruz",
-                estado_paciente: "De Alta",
-                estadoBadge: "bg-blue-100 text-blue-800 border-blue-200",
-                diagnostico: "Trastorno Límite de la Personalidad",
-                sector: "Sector Mujeres",
-                habitacion: "05",
-                cama: "Cama 05",
-                avatar: "VR",
-                avatarBg: "bg-purple-100 text-purple-800",
-                recetas: [
-                    {
-                        idReceta: 1002,
-                        fecha: "09/08/2026",
-                        medico: "Dra. Ana Gómez",
-                        estado: "Vencido",
-                        medicaciones: [
-                            { farmaco: "Quetiapina", dosis: "100 mg", via: "Subcutánea", frecuencia: "Al acostarse", observaciones: "Controlar tolerancia" }
-                        ]
-                    }
-                ]
-            }
-        ];
-
-        let selectedPatientId = 101;
+        let pacientes = JSON.parse(document.getElementById('pacientes-data').textContent);
+        let selectedPatientId = pacientes.length > 0 ? pacientes[0].id : null;
 
         window.onload = function() {
             renderPacientes();
@@ -824,6 +690,9 @@
             const p = pacientes.find(item => item.id === patientId);
             if (!p) return;
 
+            // Asignar la URL de acción del formulario de edición dinámicamente
+            document.getElementById('form-editar-paciente').action = `/pacientes/${p.id}/editar/`;
+
             document.getElementById('edit-patient-id').value = p.id;
             document.getElementById('edit-nombre').value = p.nombre;
             document.getElementById('edit-apellido').value = p.apellido;
@@ -835,9 +704,9 @@
             document.getElementById('edit-telefono').value = p.telefono;
             document.getElementById('edit-direccion').value = p.direccion;
             document.getElementById('edit-estado_paciente').value = p.estado_paciente;
-            document.getElementById('edit-sector').value = p.sector;
-            document.getElementById('edit-habitacion').value = p.habitacion;
-            document.getElementById('edit-cama').value = p.cama;
+            // document.getElementById('edit-sector').value = p.sector;
+            // document.getElementById('edit-habitacion').value = p.habitacion;
+            // document.getElementById('edit-cama').value = p.cama;
             document.getElementById('edit-diagnostico').value = p.diagnostico;
 
             document.getElementById('modal-editar-paciente').classList.remove('hidden');

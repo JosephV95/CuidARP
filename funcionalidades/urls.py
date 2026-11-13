@@ -5,7 +5,11 @@ urlpatterns = [
     path('', views.mostrar_home, name='home'), # La raíz (ej: http://127.0.0.1:8000/) abre el login
     
     # path('home/', views.home_view, name='home'),
-    path('pacientes/', views.mostrar_pacientes, name='gestion_pacientes'),
+    
+    # Rutas para la gestión de pacientes
+    path('pacientes/', views.gestion_pacientes_view, name='gestion_pacientes'),
+    path('pacientes/crear/', views.crear_paciente_view, name='crear_paciente'),
+    path('pacientes/<int:paciente_id>/editar/', views.editar_paciente_view, name='editar_paciente'),
     
     # Rutas para la gestión de enfermeros
     path('enfermeros/', views.mostrar_enfermeros, name='gestion_enfermeros'),

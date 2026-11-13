@@ -192,8 +192,158 @@ def mostrar_home(request):
     return render(request, "Home.html")
 
 
-def mostrar_pacientes(request):
-    return render(request, "Gestion_Pacientes.html")
+# * Controlador para mostrar la gestión de pacientes --------------------------
+
+def gestion_pacientes_view(request):
+    # 1. Consultamos todos los pacientes registrados en la base de datos
+    pacientes_qs = Paciente.objects.all().order_by("-fecha_registro")
+
+    pacientes_list = []
+    for p in pacientes_qs:
+        # Generar iniciales para el avatar
+        iniciales = (
+            f"{p.nombre[0]}{p.apellido[0]}".upper() if p.nombre and p.apellido else "PA"
+        )
+
+        # Obtenemos la cama asignada (si tiene una vinculada en la base de datos)
+        cama_obj = p.cama_asignada.first()
+        if cama_obj:
+            sector_nombre = cama_obj.habitacion.sector.nombre
+            habitacion_nombre = cama_obj.habitacion.nombre
+            cama_nombre = cama_obj.nombre
+        else:
+            sector_nombre = "Sin Sector"
+            habitacion_nombre = "--"
+            cama_nombre = "Sin Cama Asignada"
+
+        # Obtenemos las recetas asociadas al paciente
+        recetas_list = []
+        for r in p.recetas.all():
+            meds_list = []
+            for m in r.medicaciones.all():
+                meds_list.append(
+                    {
+                        "farmaco": m.farmaco,
+                        "dosis": m.dosis,
+                        "via": m.via,
+                        "frecuencia": m.frecuencia,
+                        "observaciones": m.observaciones or "--",
+                    }
+                )
+
+            recetas_list.append(
+                {
+                    "idReceta": r.id,  # o r.numero_receta
+                    "numero_receta": r.numero_receta,
+                    "fecha": r.fecha.strftime("%d/%m/%Y"),
+                    "medico": r.medico_prescriptor,
+                    "estado": r.estado,
+                    "medicaciones": meds_list,
+                }
+            )
+
+        # Estructura del paciente adaptada al JSON que consume tu JS
+        pacientes_list.append(
+            {
+                "id": p.id,
+                "nombre": p.nombre,
+                "apellido": p.apellido,
+                "dni": p.dni,
+                "fecha_nacimiento": (
+                    p.fecha_nacimiento.strftime("%Y-%m-%d")
+                    if p.fecha_nacimiento
+                    else ""
+                ),
+                "fechaNacimientoDisplay": (
+                    p.fecha_nacimiento.strftime("%d/%m/%Y")
+                    if p.fecha_nacimiento
+                    else ""
+                ),
+                "email": p.email or "",
+                "obra_social": p.obra_social,
+                "sexo_paciente": p.sexo_paciente,
+                "telefono": p.telefono,
+                "direccion": p.direccion,
+                "estado_paciente": p.estado_paciente,
+                "estadoBadge": (
+                    "bg-emerald-100 text-emerald-800 border-emerald-200"
+                    if p.estado_paciente == "Internado"
+                    else "bg-blue-100 text-blue-800 border-blue-200"
+                ),
+                "diagnostico": p.diagnostico,
+                "sector": sector_nombre,
+                "habitacion": habitacion_nombre,
+                "cama": cama_nombre,
+                "avatar": iniciales,
+                "avatarBg": (
+                    "bg-sky-100 text-sky-800"
+                    if p.estado_paciente == "Internado"
+                    else "bg-purple-100 text-purple-800"
+                ),
+                "recetas": recetas_list,
+            }
+        )
+
+    context = {
+        "pacientes_list": pacientes_list,
+    }
+    return render(request, "Gestion_de_pacientes.html", context)
+
+
+# Crear Paciente
+def crear_paciente_view(request):
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+        apellido = request.POST.get("apellido")
+        dni = request.POST.get("dni")
+        fecha_nacimiento = request.POST.get("fecha_nacimiento")
+        email = request.POST.get("email") or None
+        obra_social = request.POST.get("obra_social")
+        telefono = request.POST.get("telefono")
+        direccion = request.POST.get("direccion")
+        sexo_paciente = request.POST.get("sexo_paciente")
+        estado_paciente = request.POST.get("estado_paciente")
+        diagnostico = request.POST.get("diagnostico")
+
+        Paciente.objects.create(
+            nombre=nombre,
+            apellido=apellido,
+            dni=dni,
+            fecha_nacimiento=fecha_nacimiento,
+            email=email,
+            obra_social=obra_social,
+            telefono=telefono,
+            direccion=direccion,
+            sexo_paciente=sexo_paciente,
+            estado_paciente=estado_paciente,
+            diagnostico=diagnostico,
+        )
+        messages.success(request, f"Paciente {nombre} {apellido} creado con éxito.")
+    return redirect("gestion_pacientes")
+
+
+# Editar Paciente
+def editar_paciente_view(request, paciente_id):
+    if request.method == "POST":
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+        paciente.nombre = request.POST.get("nombre")
+        paciente.apellido = request.POST.get("apellido")
+        paciente.dni = request.POST.get("dni")
+        paciente.fecha_nacimiento = request.POST.get("fecha_nacimiento")
+        paciente.email = request.POST.get("email") or None
+        paciente.obra_social = request.POST.get("obra_social")
+        paciente.telefono = request.POST.get("telefono")
+        paciente.direccion = request.POST.get("direccion")
+        paciente.sexo_paciente = request.POST.get("sexo_paciente")
+        paciente.estado_paciente = request.POST.get("estado_paciente")
+        paciente.diagnostico = request.POST.get("diagnostico")
+        paciente.save()
+
+        messages.success(
+            request,
+            f"Ficha clínica de {paciente.nombre} {paciente.apellido} actualizada.",
+        )
+    return redirect("gestion_pacientes")
 
 
 # * Controlador para mostrar la gestión de enfermeros --------------------------
