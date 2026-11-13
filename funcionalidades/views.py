@@ -687,7 +687,7 @@ def guardar_administracion(request, paciente_id):
 def eliminar_administracion(request, registro_id):
     if request.method == "POST":
         registro = get_object_or_404(RegistroAdministracion, id=registro_id)
-        paciente_id = registro.paciente.id  # Rescatamos el ID antes de borrar
+        paciente_id = registro.paciente.id
 
         pin_ingresado = request.POST.get("pin_ingresado", "").strip()
 
@@ -709,3 +709,44 @@ def eliminar_administracion(request, registro_id):
             "El registro de administración ha sido eliminado correctamente.",
         )
         return redirect("gestion_planillas", paciente_id=paciente_id)
+
+    return redirect("gestion_pacientes")
+
+
+def mostrar_exportar_reportes(request, paciente_id=None):
+    # 1. Buscamos al paciente (si no mandan ID, agarramos el primero por defecto)
+    if paciente_id:
+        paciente = get_object_or_404(Paciente, id=paciente_id)
+    else:
+        paciente = Paciente.objects.first()
+        
+    if not paciente:
+        messages.warning(request, "Debe registrar al menos un paciente para ver los reportes.")
+        return redirect('gestion_pacientes')
+
+    # 2. Consultamos las recetas y los registros desde la base de datos SQLite
+    recetas = Receta.objects.filter(paciente=paciente, estado='Activo')
+    recetas_json = [{'id': r.id, 'numero_receta': r.numero_receta} for r in recetas]
+    
+    registros = RegistroAdministracion.objects.filter(paciente=paciente).order_by('-fecha', '-id')
+    registros_json = [
+        {
+            'id': reg.id,
+            'fecha': reg.fecha.strftime('%d/%m/%Y'),
+            'numero_receta': reg.receta.numero_receta,
+            'horarios': reg.horarios,
+            'observaciones': reg.observaciones or '',
+            'enfermero_nombre': f"{reg.enfermero.nombre} {reg.enfermero.apellido}",
+            'enfermero_matricula': reg.enfermero.matricula,
+        }
+        for reg in registros
+    ]
+
+    # 3. Renderizamos TU NUEVO ARCHIVO HTML de reportes
+    return render(request, 'ExportarReporte.html', {
+        'paciente': paciente,
+        'recetas_paciente_json': recetas_json,
+        'registros_json': registros_json,
+    })
+
+    

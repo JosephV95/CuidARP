@@ -1,0 +1,615 @@
+{% extends 'layouts/sidebarBase.html' %}
+
+{% block contenido %}
+<style media="print">
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+
+    @media print {
+        html, body {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            background: #fff !important;
+        }
+
+        body {
+            display: block !important;
+            color: #111827 !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        #area-planilla-pdf,
+        #area-planilla-pdf * {
+            visibility: visible !important;
+        }
+
+        #area-planilla-pdf {
+            position: absolute !important;
+            inset: 0 auto auto 0 !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #fff !important;
+        }
+
+        #area-planilla-pdf button,
+        #area-planilla-pdf .solo-pantalla {
+            display: none !important;
+        }
+
+        #area-planilla-pdf .print-only {
+            display: block !important;
+        }
+
+        #area-planilla-pdf .overflow-x-auto {
+            overflow: visible !important;
+        }
+
+        #area-planilla-pdf table {
+            width: 100% !important;
+            font-size: 9pt !important;
+        }
+
+        #area-planilla-pdf th,
+        #area-planilla-pdf td {
+            padding: 6px !important;
+            vertical-align: top !important;
+        }
+
+        #area-planilla-pdf tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        #area-planilla-pdf thead {
+            display: table-header-group;
+        }
+    }
+</style>
+<!-- ================= CONTENIDO PRINCIPAL ================= -->
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-xs">
+        <div class="relative w-full max-w-lg">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </span>
+            <input type="text" id="search-registro" onkeyup="filtrarRegistros()"
+                   placeholder="Buscar en la planilla por fecha, receta o enfermero..." 
+                   class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+                <i class="fa-regular fa-bell text-lg"></i>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
+            </button>
+
+            <div class="text-right border-l border-gray-200 pl-6">
+                <p class="text-[11px] text-gray-400 font-medium">Hospital Dr. Carlos Pereyra</p>
+                <p class="text-sm font-bold text-gray-800">Planilla de Medicación</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Área de Contenido Scrollable -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+
+            <!-- Mensajes de feedback de Django -->
+            {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                        <div class="p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- PANEL PRINCIPAL DE LA PLANILLA -->
+            <div id="area-planilla-pdf" class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs space-y-6">
+                
+                <!-- Header de la Planilla y Botón Agregar -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                    <div>
+                        <div class="flex items-center space-x-2.5">
+                            <h2 class="text-xl font-bold text-gray-900">Planilla de Administración Individual</h2>
+                            {% if request.session.rol == 'jefe' %}
+                                <span id="estado-planilla" role="status" aria-live="polite" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span id="estado-planilla-punto" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span id="estado-planilla-texto">Actualización en vivo</span>
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if request.session.rol == 'jefe' %}
+                            <p class="text-xs text-gray-500 mt-1">Vista de solo lectura · se actualiza automáticamente cada 10 segundos.</p>
+                        {% else %}
+                            <p class="text-xs text-gray-500 mt-1">Registro oficial de suministro de medicación y firma por PIN profesional.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        {% if request.session.rol == 'jefe' %}
+                            <button type="button" id="btn-exportar-pdf" onclick="exportarPlanillaPDF()"
+                                    class="solo-pantalla bg-cyan-950 hover:bg-cyan-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                                <i class="fa-solid fa-file-pdf text-xs"></i>
+                                <span>Exportar PDF</span>
+                            </button>
+                        {% else %}
+                            <button type="button" id="btn-agregar-fila" onclick="desplegarNuevaFila()"
+                                    class="bg-cyan-950 hover:bg-cyan-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                                <span>Agregar Administración</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                    <p id="fecha-exportacion" class="print-only hidden text-xs text-gray-500 md:text-right"></p>
+                </div>
+
+                <!-- Card Informativo del Paciente (Sin sector ni ubicación) -->
+                <div class="bg-gray-50/90 border border-gray-200/80 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-center space-x-3.5">
+                        <div class="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                            {{ paciente.nombre|slice:":1"|default:"P" }}{{ paciente.apellido|slice:":1"|default:"A" }}
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">PACIENTE</p>
+                            <p id="nombre-paciente-planilla" class="text-sm font-bold text-gray-900">{{ paciente.nombre }} {{ paciente.apellido }}</p>
+                            <p class="text-xs font-mono text-gray-600">DNI: {{ paciente.dni }}</p>
+                        </div>
+                    </div>
+
+                    <div class="md:border-l md:border-gray-200 md:pl-6 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">DIAGNÓSTICO CLÍNICO</p>
+                        <p class="text-sm font-bold text-gray-800 mt-0.5">{{ paciente.diagnostico }}</p>
+                    </div>
+                </div>
+
+                <!-- TABLA DE REGISTROS -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50/60">
+                                <th class="py-3 px-3 w-36">FECHA</th>
+                                <th class="py-3 px-3 w-36">Nº RECETA</th>
+                                <th class="py-3 px-3">HORARIOS DE ADMINISTRACIÓN</th>
+                                <th class="py-3 px-3 w-64">OBSERVACIONES</th>
+                                <th class="py-3 px-3 w-56 text-right">{% if request.session.rol == 'jefe' %}RESPONSABLE DE ENFERMERÍA{% else %}SELLO DE ENFERMERÍA{% endif %}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-administracion-body" class="divide-y divide-gray-200 text-xs">
+                            <!-- Renderizado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ================= MODAL DE VALIDACIÓN POR PIN ================= -->
+<div id="modal-pin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+        <div id="modal-pin-header" class="bg-forest-800 text-white p-4 flex items-center justify-between">
+            <h4 class="font-bold text-sm" id="modal-pin-titulo">Confirmación con PIN de Seguridad</h4>
+            <button type="button" onclick="cerrarModalPin()" class="text-white/80 hover:text-white p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4 text-center">
+            <p id="modal-pin-descripcion" class="text-xs text-gray-600 leading-relaxed">
+                Ingrese su PIN personal de 4 dígitos para validar su identidad y firmar esta operación.
+            </p>
+
+            <div>
+                <input type="password" id="input-pin-sello" maxlength="4" inputmode="numeric" placeholder="••••"
+                       class="w-40 mx-auto text-center tracking-[0.5em] text-xl font-mono font-bold py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                <p id="pin-client-error" class="text-[11px] font-semibold text-rose-600 mt-1.5 hidden">
+                    El PIN debe contener exactamente 4 dígitos numéricos.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-5 py-3.5 flex justify-end space-x-2.5 border-t border-gray-100">
+            <button type="button" onclick="cerrarModalPin()"
+                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                Cancelar
+            </button>
+            <button type="button" id="btn-confirmar-pin" onclick="ejecutarAccionConPin()"
+                    class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors">
+                Confirmar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario oculto para eliminar registros con PIN -->
+<form id="form-eliminar-registro" method="POST" action="" class="hidden">
+    {% csrf_token %}
+    <input type="hidden" name="pin_ingresado" id="delete-pin-input">
+</form>
+
+<!-- DATOS DESDE DJANGO -->
+{{ registros_json|json_script:"registros-data" }}
+{{ recetas_paciente_json|json_script:"recetas-data" }}
+
+<script>
+    let registrosGuardados = JSON.parse(document.getElementById('registros-data').textContent || '[]');
+    let recetasPaciente = JSON.parse(document.getElementById('recetas-data').textContent || '[]');
+    const HORARIOS_DISPONIBLES = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
+    const ES_JEFE = "{{ request.session.rol|default:''|escapejs }}" === 'jefe';
+    const INTERVALO_ACTUALIZACION_MS = 10000;
+
+    let accionPendiente = null;
+    let registroIdAEliminar = null;
+    let filaNuevaAbierta = false;
+    let consultaEnCurso = false;
+    let impresionEnCurso = false;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderTabla();
+        if (ES_JEFE) iniciarActualizacionEnVivo();
+    });
+
+    function escaparHTML(valor) {
+        return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[caracter]);
+    }
+
+    function getFechaHoyISO() {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function renderTabla(filtro = '') {
+        const tbody = document.getElementById('tabla-administracion-body');
+        tbody.innerHTML = '';
+
+        let lista = registrosGuardados;
+        if (filtro.trim() !== '') {
+            const q = filtro.toLowerCase();
+            lista = registrosGuardados.filter(r =>
+                r.fecha.toLowerCase().includes(q) ||
+                String(r.numero_receta).toLowerCase().includes(q) ||
+                r.enfermero_nombre.toLowerCase().includes(q) ||
+                (r.observaciones && r.observaciones.toLowerCase().includes(q))
+            );
+        }
+
+        if (lista.length === 0 && !filaNuevaAbierta) {
+            tbody.innerHTML = `
+                <tr id="fila-vacia-msg">
+                    <td colspan="5" class="py-10 text-center text-gray-400 text-xs">
+                        ${filtro.trim() ? 'No hay administraciones que coincidan con la búsqueda.' : (ES_JEFE ? 'Este paciente todavía no tiene administraciones registradas.' : 'No hay registros de administración cargados para este paciente. Presione "Agregar Administración" para iniciar.')}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        lista.forEach(reg => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-gray-50/50 transition-colors";
+
+            const horariosHtml = HORARIOS_DISPONIBLES.map(h => {
+                const activo = (reg.horarios || []).includes(h);
+                return activo
+                    ? `<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">${h}</span>`
+                    : `<span class="px-2.5 py-1 rounded-md text-[11px] font-medium bg-gray-50 text-gray-300 border border-gray-200 line-through">${h}</span>`;
+            }).join('');
+
+            tr.innerHTML = `
+                <td class="py-3.5 px-3 font-mono font-bold text-gray-800 align-middle">${escaparHTML(reg.fecha)}</td>
+                <td class="py-3.5 px-3 align-middle">
+                    <span class="px-2.5 py-1 bg-gray-100 text-gray-800 rounded-md font-mono font-bold text-xs border border-gray-200">${escaparHTML(reg.numero_receta)}</span>
+                </td>
+                <td class="py-3.5 px-3 align-middle">
+                    <div class="flex items-center flex-wrap gap-1.5">${horariosHtml}</div>
+                </td>
+                <td class="py-3.5 px-3 align-middle">
+                    <div class="bg-gray-50 px-3 py-2 rounded-lg border border-gray-200/80 text-gray-700 text-xs">${escaparHTML(reg.observaciones || 'Sin observaciones.')}</div>
+                </td>
+                <td class="py-3.5 px-3 align-middle text-right">
+                    <div class="flex items-center justify-end space-x-3">
+                        <div class="text-right">
+                            <p class="font-bold text-gray-900 text-xs leading-tight">${escaparHTML(reg.enfermero_nombre)}</p>
+                            <p class="text-[10px] font-mono text-gray-500">Mat. ${escaparHTML(reg.enfermero_matricula)}</p>
+                        </div>
+                        ${ES_JEFE ? '' : `<button type="button" onclick="solicitarPinEliminar(${Number(reg.id)})"
+                                class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-[11px] rounded-lg transition-colors">
+                            Eliminar
+                        </button>`}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function marcarEstadoPlanilla(texto, estado = 'ok') {
+        const indicador = document.getElementById('estado-planilla');
+        const punto = document.getElementById('estado-planilla-punto');
+        const etiqueta = document.getElementById('estado-planilla-texto');
+        if (!indicador || !punto || !etiqueta) return;
+
+        const estilos = {
+            ok: ['bg-emerald-50', 'text-emerald-700', 'border-emerald-200', 'bg-emerald-500'],
+            sync: ['bg-sky-50', 'text-sky-700', 'border-sky-200', 'bg-sky-500'],
+            error: ['bg-rose-50', 'text-rose-700', 'border-rose-200', 'bg-rose-500']
+        };
+        const [fondo, textoColor, borde, puntoColor] = estilos[estado] || estilos.ok;
+        indicador.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${fondo} ${textoColor} border ${borde}`;
+        punto.className = `w-1.5 h-1.5 rounded-full ${puntoColor}`;
+        etiqueta.textContent = texto;
+    }
+
+    function horaActualizacion() {
+        return new Intl.DateTimeFormat('es-AR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(new Date());
+    }
+
+    function iniciarActualizacionEnVivo() {
+        marcarEstadoPlanilla('Conectando…', 'sync');
+        revisarPlanillaEnVivo();
+        window.setInterval(revisarPlanillaEnVivo, INTERVALO_ACTUALIZACION_MS);
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) revisarPlanillaEnVivo();
+        });
+    }
+
+    async function revisarPlanillaEnVivo() {
+        if (consultaEnCurso || impresionEnCurso || document.hidden) return;
+
+        consultaEnCurso = true;
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('_actualizacion', Date.now());
+            const respuesta = await fetch(url.toString(), {
+                method: 'GET',
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!respuesta.ok) throw new Error('No se pudo consultar la planilla.');
+
+            const html = await respuesta.text();
+            const documento = new DOMParser().parseFromString(html, 'text/html');
+            const registrosActualizados = documento.getElementById('registros-data');
+            const recetasActualizadas = documento.getElementById('recetas-data');
+            if (!registrosActualizados || !recetasActualizadas) {
+                throw new Error('La respuesta no contiene los datos de la planilla.');
+            }
+
+            const nuevosRegistros = JSON.parse(registrosActualizados.textContent || '[]');
+            const nuevasRecetas = JSON.parse(recetasActualizadas.textContent || '[]');
+            const hayCambios = JSON.stringify(nuevosRegistros) !== JSON.stringify(registrosGuardados) ||
+                JSON.stringify(nuevasRecetas) !== JSON.stringify(recetasPaciente);
+
+            if (hayCambios) {
+                registrosGuardados = nuevosRegistros;
+                recetasPaciente = nuevasRecetas;
+                renderTabla(document.getElementById('search-registro').value);
+                marcarEstadoPlanilla(`Cambios recibidos · ${horaActualizacion()}`);
+            } else {
+                marcarEstadoPlanilla(`Actualizado · ${horaActualizacion()}`);
+            }
+        } catch (error) {
+            marcarEstadoPlanilla('Sin conexión · reintentando', 'error');
+        } finally {
+            consultaEnCurso = false;
+        }
+    }
+
+    function exportarPlanillaPDF() {
+        if (!ES_JEFE || typeof window.print !== 'function') return;
+
+        const tituloOriginal = document.title;
+        const buscador = document.getElementById('search-registro');
+        const busquedaAnterior = buscador.value;
+        const nombrePaciente = document.getElementById('nombre-paciente-planilla').textContent.trim();
+        const ahora = new Date();
+        const fechaLarga = new Intl.DateTimeFormat('es-AR', {
+            dateStyle: 'short',
+            timeStyle: 'short'
+        }).format(ahora);
+        const fechaNombre = [ahora.getFullYear(), String(ahora.getMonth() + 1).padStart(2, '0'), String(ahora.getDate()).padStart(2, '0')].join('-');
+
+        document.getElementById('fecha-exportacion').textContent = `Exportada el ${fechaLarga}`;
+        document.title = `Planilla de administración - ${nombrePaciente} - ${fechaNombre}`;
+        buscador.value = '';
+        renderTabla();
+        impresionEnCurso = true;
+
+        window.addEventListener('afterprint', function restaurarTitulo() {
+            document.title = tituloOriginal;
+            buscador.value = busquedaAnterior;
+            renderTabla(busquedaAnterior);
+            impresionEnCurso = false;
+            revisarPlanillaEnVivo();
+        }, { once: true });
+
+        window.print();
+    }
+
+    function desplegarNuevaFila() {
+        if (filaNuevaAbierta) {
+            document.getElementById('input-fecha-nueva').focus();
+            return;
+        }
+
+        const msgVacio = document.getElementById('fila-vacia-msg');
+        if (msgVacio) msgVacio.remove();
+
+        filaNuevaAbierta = true;
+        const tbody = document.getElementById('tabla-administracion-body');
+
+        let opcionesRecetas = `<option value="">Seleccione...</option>`;
+        recetasPaciente.forEach(rec => {
+            opcionesRecetas += `<option value="${Number(rec.id)}">${escaparHTML(rec.numero_receta)}</option>`;
+        });
+
+        const checkboxesHorarios = HORARIOS_DISPONIBLES.map(h => `
+            <label class="cursor-pointer select-none">
+                <input type="checkbox" name="horarios" value="${h}" form="form-nueva-administracion" class="peer hidden">
+                <span class="px-2.5 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-500 text-[11px] font-semibold inline-block peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-700 transition-all">
+                    ${h}
+                </span>
+            </label>
+        `).join('');
+
+        const trNueva = document.createElement('tr');
+        trNueva.id = 'fila-nueva-editable';
+        trNueva.className = 'bg-emerald-50/40 border-l-4 border-l-emerald-600';
+
+        trNueva.innerHTML = `
+            <td class="py-3.5 px-3 align-middle">
+                <form id="form-nueva-administracion" method="POST" action="{% url 'guardar_administracion' paciente.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="pin_ingresado" id="save-pin-input">
+                </form>
+                <input type="date" id="input-fecha-nueva" name="fecha" form="form-nueva-administracion"
+                       value="${getFechaHoyISO()}" required
+                       class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg font-mono font-semibold text-gray-800 focus:ring-2 focus:ring-forest-800 focus:outline-none">
+            </td>
+            <td class="py-3.5 px-3 align-middle">
+                <select id="select-receta-nueva" name="receta_id" form="form-nueva-administracion" required
+                        class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg font-mono font-bold text-gray-800 focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    ${opcionesRecetas}
+                </select>
+            </td>
+            <td class="py-3.5 px-3 align-middle">
+                <div class="flex items-center flex-wrap gap-1.5" id="grupo-horarios-nuevos">${checkboxesHorarios}</div>
+            </td>
+            <td class="py-3.5 px-3 align-middle">
+                <input type="text" name="observaciones" form="form-nueva-administracion" placeholder="Ej: Sin novedades..."
+                       class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-forest-800 focus:outline-none">
+            </td>
+            <td class="py-3.5 px-3 align-middle text-right">
+                <div class="flex items-center justify-end space-x-2">
+                    <button type="button" onclick="cancelarNuevaFila()"
+                            class="px-2.5 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold text-[11px] rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="solicitarPinGuardar()"
+                            class="px-3.5 py-1.5 bg-forest-800 hover:bg-forest-700 text-white font-semibold text-[11px] rounded-lg shadow-xs transition-colors">
+                        Guardar
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.prepend(trNueva);
+    }
+
+    function cancelarNuevaFila() {
+        const fila = document.getElementById('fila-nueva-editable');
+        if (fila) fila.remove();
+        filaNuevaAbierta = false;
+        if (registrosGuardados.length === 0) renderTabla();
+    }
+
+    function solicitarPinGuardar() {
+        const fecha = document.getElementById('input-fecha-nueva').value;
+        const receta = document.getElementById('select-receta-nueva').value;
+        const horariosChecked = document.querySelectorAll('#grupo-horarios-nuevos input[type="checkbox"]:checked');
+
+        if (!fecha || !receta) {
+            alert("Por favor seleccione la Fecha y el Nº de Receta antes de guardar.");
+            return;
+        }
+        if (horariosChecked.length === 0) {
+            alert("Debe seleccionar al menos un horario de administración.");
+            return;
+        }
+
+        accionPendiente = 'guardar';
+        document.getElementById('modal-pin-header').className = "bg-forest-800 text-white p-4 flex items-center justify-between";
+        document.getElementById('modal-pin-titulo').innerText = "Firmar y Guardar Administración";
+        document.getElementById('modal-pin-descripcion').innerText = "Ingrese su PIN personal de 4 dígitos. Su nombre y matrícula quedarán registrados como responsable.";
+        document.getElementById('btn-confirmar-pin').className = "px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors";
+        document.getElementById('btn-confirmar-pin').innerText = "Firmar y Guardar";
+        abrirModalPin();
+    }
+
+    function solicitarPinEliminar(registroId) {
+        accionPendiente = 'eliminar';
+        registroIdAEliminar = registroId;
+
+        document.getElementById('modal-pin-header').className = "bg-rose-700 text-white p-4 flex items-center justify-between";
+        document.getElementById('modal-pin-titulo').innerText = "Confirmar Eliminación de Registro";
+        document.getElementById('modal-pin-descripcion').innerText = "Ingrese su PIN personal de 4 dígitos para autorizar la eliminación de este registro.";
+        document.getElementById('btn-confirmar-pin').className = "px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition-colors";
+        document.getElementById('btn-confirmar-pin').innerText = "Autorizar y Eliminar";
+        abrirModalPin();
+    }
+
+    function abrirModalPin() {
+        const input = document.getElementById('input-pin-sello');
+        input.value = '';
+        document.getElementById('pin-client-error').classList.add('hidden');
+        document.getElementById('modal-pin').classList.remove('hidden');
+        setTimeout(() => input.focus(), 100);
+    }
+
+    function cerrarModalPin() {
+        document.getElementById('modal-pin').classList.add('hidden');
+        accionPendiente = null;
+        registroIdAEliminar = null;
+    }
+
+    function ejecutarAccionConPin() {
+        const pin = document.getElementById('input-pin-sello').value.trim();
+        const errorMsg = document.getElementById('pin-client-error');
+
+        if (!/^\d{4}$/.test(pin)) {
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        if (accionPendiente === 'guardar') {
+            document.getElementById('save-pin-input').value = pin;
+            document.getElementById('form-nueva-administracion').submit();
+        } else if (accionPendiente === 'eliminar' && registroIdAEliminar) {
+            const formDel = document.getElementById('form-eliminar-registro');
+            formDel.action = `/planillas/registro/${registroIdAEliminar}/eliminar/`;
+            document.getElementById('delete-pin-input').value = pin;
+            formDel.submit();
+        }
+    }
+
+    function filtrarRegistros() {
+        const q = document.getElementById('search-registro').value;
+        renderTabla(q);
+    }
+</script>
+{% endblock %}
