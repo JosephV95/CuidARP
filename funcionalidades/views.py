@@ -226,7 +226,7 @@ def gestion_pacientes_view(request):
                         "farmaco": m.farmaco,
                         "dosis": m.dosis,
                         "via": m.via,
-                        "frecuencia": m.frecuencia,
+                        "frecuencia": m.frecuencia or [],
                         "observaciones": m.observaciones or "--",
                     }
                 )
@@ -520,6 +520,8 @@ def asignar_paciente_view(request, cama_id):
 # Controladores para la creacion de Recetas y sus Medicaciones asociadas
 
 def crear_receta_view(request, paciente_id):
+    FRECUENCIAS_VALIDAS = ["Desayuno", "Almuerzo", "Merienda", "Cena"]
+    
     if request.method == "POST":
         paciente = get_object_or_404(Paciente, id=paciente_id)
 
@@ -538,23 +540,31 @@ def crear_receta_view(request, paciente_id):
         )
 
         # 3. Capturar las listas de fármacos enviadas desde el form dinámico
-        farmacos = request.POST.getlist("farmaco[]")
-        dosis_list = request.POST.getlist("dosis[]")
-        vias = request.POST.getlist("via[]")
-        frecuencias = request.POST.getlist("frecuencia[]")
-        observaciones_list = request.POST.getlist("observaciones[]")
+        fila_indices = request.POST.getlist('fila_idx[]')
+        farmacos = request.POST.getlist('farmaco[]')
+        dosis_list = request.POST.getlist('dosis[]')
+        vias = request.POST.getlist('via[]')
+        observaciones_list = request.POST.getlist('observaciones[]')
 
         # 4. Iterar y guardar cada medicamento asociado a esta receta
         for i in range(len(farmacos)):
             if farmacos[i].strip() and dosis_list[i].strip():
+                idx_actual = fila_indices[i] if i < len(fila_indices) else str(i)
+                frecuencias_raw = request.POST.getlist(f'frecuencia_{idx_actual}[]')
+                frecuencias_limpias = [
+                    f for f in frecuencias_raw if f in FRECUENCIAS_VALIDAS
+                ]
+
                 MedicacionReceta.objects.create(
                     receta=receta,
-                    farmaco=farmacos[i],
-                    dosis=dosis_list[i],
-                    via=vias[i] if i < len(vias) else "Oral",
-                    frecuencia=frecuencias[i] if i < len(frecuencias) else "",
+                    farmaco=farmacos[i].strip(),
+                    dosis=dosis_list[i].strip(),
+                    via=vias[i] if i < len(vias) else 'Oral',
+                    frecuencia=frecuencias_limpias,
                     observaciones=(
-                        observaciones_list[i] if i < len(observaciones_list) else ""
+                        observaciones_list[i].strip()
+                        if i < len(observaciones_list)
+                        else ''
                     ),
                 )
 
@@ -586,19 +596,19 @@ def mostrar_planillas(request, paciente_id=None):
         # Al usar prefetch_related, r.medicaciones.all() ya viene en memoria sin repetir queries
         medicaciones_list = [
             {
-                "farmaco": m.farmaco,  
-                "dosis": m.dosis,  
-                "via": m.via,  
-                "frecuencia": m.frecuencia,  
+                "farmaco": m.farmaco,
+                "dosis": m.dosis,
+                "via": m.via,
+                "frecuencia": m.frecuencia or [],
             }
-            for m in r.medicaciones.all()  
+            for m in r.medicaciones.all()
         ]
 
         recetas_json.append(
             {
                 "id": r.id,
-                "numero_receta": r.numero_receta,  
-                "medico_prescriptor": r.medico_prescriptor,  
+                "numero_receta": r.numero_receta,
+                "medico_prescriptor": r.medico_prescriptor,
                 "medicaciones": medicaciones_list,
             }
         )

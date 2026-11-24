@@ -11,15 +11,18 @@
                 <i class="fa-solid fa-magnifying-glass text-sm"></i>
             </span>
             <input type="text" id="search-registro" onkeyup="filtrarRegistros()"
-                   placeholder="Buscar en la planilla por fecha, receta o enfermero..." 
-                   class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
+                placeholder="Buscar en la planilla por fecha, receta o enfermero..."
+                class="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-forest-800 focus:bg-white transition-all">
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <kbd class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘ K</kbd>
+                <kbd
+                    class="px-2 py-0.5 text-[11px] font-semibold text-gray-400 bg-white border border-gray-200 rounded-md shadow-2xs">⌘
+                    K</kbd>
             </div>
         </div>
 
         <div class="flex items-center space-x-6">
-            <button class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
+            <button
+                class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
                 <i class="fa-regular fa-bell text-lg"></i>
                 <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white"></span>
             </button>
@@ -37,34 +40,39 @@
 
             <!-- Mensajes de feedback de Django -->
             {% if messages %}
-                <div class="space-y-2">
-                    {% for message in messages %}
-                        <div class="p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
-                            <span>{{ message }}</span>
-                            <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    {% endfor %}
+            <div class="space-y-2">
+                {% for message in messages %}
+                <div
+                    class="p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100"><i
+                            class="fa-solid fa-xmark"></i></button>
                 </div>
+                {% endfor %}
+            </div>
             {% endif %}
 
             <!-- PANEL PRINCIPAL DE LA PLANILLA -->
             <div id="area-planilla-pdf" class="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs space-y-6">
-                
+
                 <!-- Header de la Planilla y Botón Agregar -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
+                <div
+                    class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
                     <div>
                         <div class="flex items-center space-x-2.5">
                             <h2 class="text-xl font-bold text-gray-900">Planilla de Administración Individual</h2>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 EN TIEMPO REAL
                             </span>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">Registro oficial de suministro de medicación y firma por PIN profesional.</p>
+                        <p class="text-xs text-gray-500 mt-1">Registro oficial de suministro de medicación y firma por
+                            PIN profesional.</p>
                     </div>
 
                     <div class="flex items-center space-x-3">
                         <button type="button" id="btn-agregar-fila" onclick="desplegarNuevaFila()"
-                                class="bg-emerald-800 hover:bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
+                            class="bg-emerald-800 hover:bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-2 shadow-xs transition-all">
                             <i class="fa-solid fa-plus text-xs"></i>
                             <span>Agregar Administración</span>
                         </button>
@@ -72,9 +80,11 @@
                 </div>
 
                 <!-- Card Informativo del Paciente (Sin sector ni ubicación) -->
-                <div class="bg-gray-50/90 border border-gray-200/80 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div
+                    class="bg-gray-50/90 border border-gray-200/80 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex items-center space-x-3.5">
-                        <div class="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                        <div
+                            class="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
                             {{ paciente.nombre|slice:":1"|default:"P" }}{{ paciente.apellido|slice:":1"|default:"A" }}
                         </div>
                         <div>
@@ -94,7 +104,8 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50/60">
+                            <tr
+                                class="text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 bg-gray-50/60">
                                 <th class="py-3 px-3 w-36">FECHA</th>
                                 <th class="py-3 px-3 w-36">Nº RECETA</th>
                                 <th class="py-3 px-3">HORARIOS DE ADMINISTRACIÓN</th>
@@ -114,8 +125,10 @@
 </div>
 
 <!-- ================= MODAL DE VALIDACIÓN POR PIN ================= -->
-<div id="modal-pin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
-    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
+<div id="modal-pin"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+    <div
+        class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
         <div id="modal-pin-header" class="bg-forest-800 text-white p-4 flex items-center justify-between">
             <h4 class="font-bold text-sm" id="modal-pin-titulo">Confirmación con PIN de Seguridad</h4>
             <button type="button" onclick="cerrarModalPin()" class="text-white/80 hover:text-white p-1">
@@ -130,7 +143,7 @@
 
             <div>
                 <input type="password" id="input-pin-sello" maxlength="4" inputmode="numeric" placeholder="••••"
-                       class="w-40 mx-auto text-center tracking-[0.5em] text-xl font-mono font-bold py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
+                    class="w-40 mx-auto text-center tracking-[0.5em] text-xl font-mono font-bold py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-800 focus:outline-none">
                 <p id="pin-client-error" class="text-[11px] font-semibold text-rose-600 mt-1.5 hidden">
                     El PIN debe contener exactamente 4 dígitos numéricos.
                 </p>
@@ -139,11 +152,11 @@
 
         <div class="bg-gray-50 px-5 py-3.5 flex justify-end space-x-2.5 border-t border-gray-100">
             <button type="button" onclick="cerrarModalPin()"
-                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-semibold rounded-xl transition-colors">
                 Cancelar
             </button>
             <button type="button" id="btn-confirmar-pin" onclick="ejecutarAccionConPin()"
-                    class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors">
+                class="px-4 py-2 bg-forest-800 hover:bg-forest-700 text-white text-xs font-semibold rounded-xl transition-colors">
                 Confirmar
             </button>
         </div>
@@ -164,6 +177,12 @@
     const registrosGuardados = JSON.parse(document.getElementById('registros-data').textContent || '[]');
     const recetasPaciente = JSON.parse(document.getElementById('recetas-data').textContent || '[]');
     const HORARIOS_DISPONIBLES = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
+    const INICIALES_FRECUENCIA = {
+        'Desayuno': 'D',
+        'Almuerzo': 'A',
+        'Merienda': 'M',
+        'Cena': 'C'
+    };
 
     let accionPendiente = null;
     let registroIdAEliminar = null;
@@ -265,7 +284,7 @@
 
         const checkboxesHorarios = HORARIOS_DISPONIBLES.map(h => `
             <label class="cursor-pointer select-none">
-                <input type="checkbox" name="horarios" value="${h}" form="form-nueva-administracion" class="peer hidden">
+                <input type="checkbox" name="horarios" value="${h}" form="form-nueva-administracion" onchange="actualizarMedicamentosSeleccionados()" class="peer hidden">
                 <span class="px-2.5 py-1.5 rounded-lg border border-gray-300 bg-white text-gray-500 text-[11px] font-semibold inline-block peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-700 transition-all">
                     ${h}
                 </span>
@@ -348,17 +367,53 @@
             return;
         }
 
-        const chips = recetaObj.medicaciones.map(m => `
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-100/30 border border-cyan-500 text-gray-800 shadow-2xs">
-                <i class="fa-solid fa-pills text-cyan-600 text-[10px]"></i>
-                <strong>${m.farmaco}</strong>
-                <span class="font-mono text-gray-600">${m.dosis}</span>
-                <span class="text-gray-400">•</span>
-                <span class="text-gray-500">${m.via}</span>
-            </span>
-        `).join('');
+        // Horarios marcados actualmente en la fila de administración
+        const horariosMarcados = Array.from(
+            document.querySelectorAll('#grupo-horarios-nuevos input[type="checkbox"]:checked')
+        ).map(cb => cb.value);
 
-        container.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider text-cyan-700 mr-1">Fármacos de la receta:</span>${chips}`;
+        // Filtrar fármacos:
+        // - Si no hay horarios marcados: mostrar todos.
+        // - Si hay horarios marcados: mostrar si su frecuencia está vacía ([]) o coincide con alguno marcado.
+        const medsFiltrados = recetaObj.medicaciones.filter(m => {
+            const freqs = Array.isArray(m.frecuencia) ? m.frecuencia : [];
+            if (horariosMarcados.length === 0) return true;
+            if (freqs.length === 0) return true;
+            return freqs.some(f => horariosMarcados.includes(f));
+        });
+
+        if (medsFiltrados.length === 0) {
+            container.innerHTML = `<span class="text-gray-500 italic">No hay fármacos asignados a los horarios seleccionados (excepto los de horario libre).</span>`;
+            trMeds.classList.remove('hidden');
+            return;
+        }
+
+        const chips = medsFiltrados.map(m => {
+            const freqs = Array.isArray(m.frecuencia) ? m.frecuencia : [];
+            let badgeFreq = '';
+
+            if (freqs.length > 0) {
+                const iniciales = freqs
+                    .map(f => INICIALES_FRECUENCIA[f] || f.charAt(0).toUpperCase())
+                    .join(' · ');
+                badgeFreq = `<span title="${freqs.join(', ')}" class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono font-bold text-[10px]">${iniciales}</span>`;
+            } else {
+                badgeFreq = `<span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-semibold text-[10px]">A demanda</span>`;
+            }
+
+            return `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-cyan-500 text-gray-800 shadow-2xs">
+                    <i class="fa-solid fa-pills text-cyan-700 text-[10px]"></i>
+                    <strong>${m.farmaco}</strong>
+                    <span class="font-mono text-gray-600">${m.dosis}</span>
+                    <span class="text-gray-400">•</span>
+                    <span class="text-gray-500">${m.via}</span>
+                    ${badgeFreq}
+                </span>
+            `;
+        }).join('');
+
+        container.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider text-cyan-800 mr-1">Fármacos:</span>${chips}`;
         trMeds.classList.remove('hidden');
     }
 
