@@ -231,7 +231,7 @@ class MedicacionReceta(models.Model):
     farmaco = models.CharField(max_length=100, verbose_name='Fármaco')
     dosis = models.CharField(max_length=50, verbose_name='Dosis')
     via = models.CharField(max_length=30, choices=VIA_CHOICES, verbose_name='Vía de Administración')
-    frecuencia = models.CharField(max_length=50, verbose_name='Frecuencia')
+    frecuencia = models.JSONField(default=list, blank=True)
     observaciones = models.TextField(blank=True, null=True, verbose_name='Observaciones')
 
     def __str__(self):
