@@ -35,7 +35,7 @@ urlpatterns = [
     path('planillas/registro/<int:registro_id>/eliminar/', views.eliminar_administracion, name='eliminar_administracion'),
 
    # Rutas para exportar reportes
-path('ExportarReporte/', views.mostrar_exportar_reportes, name='ExportarReporte'),
-path('ExportarReporte/<int:paciente_id>/', views.mostrar_exportar_reportes, name='ExportarReportePaciente'),
+    path('ExportarReporte/', views.mostrar_exportar_reportes, name='ExportarReporte'),
+    path('ExportarReporte/<int:paciente_id>/', views.mostrar_exportar_reportes, name='ExportarReportePaciente'),
 
 ]
