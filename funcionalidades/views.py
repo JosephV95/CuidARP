@@ -561,8 +561,7 @@ def crear_receta_view(request, paciente_id):
         messages.success(request, f"Receta N° {numero_receta} prescripta con éxito.")
     return redirect("gestion_pacientes")
 
-# PRUEBAS PLANILLAS
-
+# * Controladores para la gestión de planillas de administración de medicación ---------------------
 def mostrar_planillas(request, paciente_id=None):
     # Si ingresan a /planillas/ sin ID, seleccionamos el primer paciente disponible automáticamente
     if paciente_id:
@@ -575,25 +574,53 @@ def mostrar_planillas(request, paciente_id=None):
         messages.warning(
             request, "Debe registrar al menos un paciente para ver las planillas."
         )
-        return redirect("gestion_pacientes")  # O a la vista que prefieras
+        return redirect("gestion_pacientes")
 
-    # Obtener las recetas activas exclusivamente de este paciente
-    recetas = Receta.objects.filter(paciente=paciente, estado="Activo")
-    recetas_json = [{"id": r.id, "numero_receta": r.numero_receta} for r in recetas]
+    # Traemos las recetas activas y precargamos sus medicaciones en una consulta adicional optimizada
+    recetas = Receta.objects.filter(
+        paciente=paciente, estado="Activo"
+    ).prefetch_related("medicaciones")  
 
-    # Obtener los registros de administración de este paciente
-    registros = RegistroAdministracion.objects.filter(paciente=paciente).order_by(
-        "-fecha", "-id"
+    recetas_json = []
+    for r in recetas:
+        # Al usar prefetch_related, r.medicaciones.all() ya viene en memoria sin repetir queries
+        medicaciones_list = [
+            {
+                "farmaco": m.farmaco,  
+                "dosis": m.dosis,  
+                "via": m.via,  
+                "frecuencia": m.frecuencia,  
+            }
+            for m in r.medicaciones.all()  
+        ]
+
+        recetas_json.append(
+            {
+                "id": r.id,
+                "numero_receta": r.numero_receta,  
+                "medico_prescriptor": r.medico_prescriptor,  
+                "medicaciones": medicaciones_list,
+            }
+        )
+
+    # Traemos los registros junto con su receta y enfermero mediante JOIN (select_related)
+    registros = (
+        RegistroAdministracion.objects.filter(paciente=paciente)
+        .select_related("receta", "enfermero")  
+        .order_by("-fecha", "-id")  
     )
+
     registros_json = [
         {
             "id": reg.id,
-            "fecha": reg.fecha.strftime("%d/%m/%Y"),
-            "numero_receta": reg.receta.numero_receta,
-            "horarios": reg.horarios,
-            "observaciones": reg.observaciones or "",
-            "enfermero_nombre": f"{reg.enfermero.nombre} {reg.enfermero.apellido}",
-            "enfermero_matricula": reg.enfermero.matricula,
+            "fecha": reg.fecha.strftime("%d/%m/%Y"),  
+            "numero_receta": reg.receta.numero_receta,  
+            "horarios": reg.horarios,  
+            "observaciones": reg.observaciones or "",  
+            "enfermero_nombre": (
+                f"{reg.enfermero.nombre} {reg.enfermero.apellido}"
+            ),  
+            "enfermero_matricula": reg.enfermero.matricula,  
         }
         for reg in registros
     ]
@@ -614,31 +641,34 @@ def guardar_administracion(request, paciente_id):
         paciente = get_object_or_404(Paciente, id=paciente_id)
         pin_ingresado = request.POST.get("pin_ingresado", "").strip()
 
-        # Validar el PIN contra los enfermeros activos y verificados
-        enfermero_firmante = None
-        for enf in Enfermero.objects.filter(activo=True, verificado=True):
-            if enf.pin_sello == pin_ingresado:
-                enfermero_firmante = enf
-                break
+        # 1. Obtener únicamente al enfermero autenticado en la sesión actual
+        enfermero_id = request.session.get('enfermero_id')
+        enfermero_firmante = Enfermero.objects.filter(
+            id=enfermero_id, activo=True, verificado=True
+        ).first()
 
-        if not enfermero_firmante:
+        if not enfermero_firmante or enfermero_firmante.pin_sello != pin_ingresado:
             messages.error(
-                request, "PIN incorrecto o no pertenece a un enfermero habilitado."
+                request, "PIN incorrecto."
             )
-            return redirect("gestion_planillas", paciente_id=paciente.id)
+            return redirect('gestion_planillas', paciente_id=paciente.id)
+        
 
         horarios_nuevos = request.POST.getlist("horarios")
         receta_id = request.POST.get("receta_id")
         fecha = request.POST.get("fecha")
         observaciones = request.POST.get("observaciones", "").strip()
 
-        # 1. BUSCAR SI YA EXISTE UN REGISTRO PARA ESTA RECETA Y ESTA FECHA
+        # 2. Buscar registro existente para paciente, receta, fecha Y el mismo enfermero
         registro_existente = RegistroAdministracion.objects.filter(
-            paciente=paciente, receta_id=receta_id, fecha=fecha
+            paciente=paciente,
+            receta_id=receta_id,
+            fecha=fecha,
+            enfermero=enfermero_firmante,
         ).first()
 
         if registro_existente:
-            # 2. SI EXISTE: Actualizamos combinando los horarios (evitando duplicados)
+            # 3. SI EXISTE: Actualizamos combinando los horarios (evitando duplicados)
             horarios_actuales = (
                 registro_existente.horarios
                 if isinstance(registro_existente.horarios, list)
@@ -655,8 +685,6 @@ def guardar_administracion(request, paciente_id):
             if observaciones:
                 registro_existente.observaciones = observaciones
 
-            # Actualizamos también el último enfermero que firmó la modificación
-            registro_existente.enfermero = enfermero_firmante
             registro_existente.save()
 
             messages.success(
@@ -665,7 +693,7 @@ def guardar_administracion(request, paciente_id):
                 f" por {enfermero_firmante.nombre} {enfermero_firmante.apellido}.",
             )
         else:
-            # 3. SI NO EXISTE: Creamos un registro completamente nuevo
+            # 4. SI NO EXISTE: Creamos un registro completamente nuevo
             RegistroAdministracion.objects.create(
                 paciente=paciente,
                 receta_id=receta_id,
@@ -688,29 +716,37 @@ def eliminar_administracion(request, registro_id):
     if request.method == "POST":
         registro = get_object_or_404(RegistroAdministracion, id=registro_id)
         paciente_id = registro.paciente.id
-
         pin_ingresado = request.POST.get("pin_ingresado", "").strip()
 
-        enfermero_autorizado = None
-        for enf in Enfermero.objects.filter(activo=True, verificado=True):
-            if enf.pin_sello == pin_ingresado:
-                enfermero_autorizado = enf
-                break
+        # 1. Validar que haya un enfermero activo y verificado en sesión y que su PIN coincida
+        enfermero_id = request.session.get("enfermero_id")
+        enfermero_actual = Enfermero.objects.filter(
+            id=enfermero_id, activo=True, verificado=True
+        ).first()
 
-        if not enfermero_autorizado:
+        if not enfermero_actual or enfermero_actual.pin_sello != pin_ingresado:
             messages.error(
-                request, "PIN incorrecto. No se pudo autorizar la eliminación."
+                request,
+                "PIN incorrecto o sesión no válida para el enfermero actual.",
             )
             return redirect("gestion_planillas", paciente_id=paciente_id)
 
+        # 2. Verificar que el registro haya sido firmado por el mismo enfermero que intenta borrarlo
+        if registro.enfermero_id != enfermero_actual.id:
+            messages.error(
+                request,
+                "Solo el enfermero que firmó este registro puede eliminarlo"
+                f" (Firmado por {registro.enfermero.nombre}"
+                f" {registro.enfermero.apellido}).",
+            )
+            return redirect("gestion_planillas", paciente_id=paciente_id)
+
+        # 3. Eliminar el registro
         registro.delete()
-        messages.success(
-            request,
-            "El registro de administración ha sido eliminado correctamente.",
-        )
+        messages.success(request, "Registro de administración eliminado.")
         return redirect("gestion_planillas", paciente_id=paciente_id)
 
-    return redirect("gestion_pacientes")
+    return redirect("gestion_planillas")
 
 
 def mostrar_exportar_reportes(request, paciente_id=None):

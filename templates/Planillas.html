@@ -287,7 +287,7 @@
                        class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg font-mono font-semibold text-gray-800 focus:ring-2 focus:ring-forest-800 focus:outline-none">
             </td>
             <td class="py-3.5 px-3 align-middle">
-                <select id="select-receta-nueva" name="receta_id" form="form-nueva-administracion" required
+                <select id="select-receta-nueva" name="receta_id" form="form-nueva-administracion" onchange="actualizarMedicamentosSeleccionados()" required
                         class="w-full text-xs p-2 bg-white border border-gray-300 rounded-lg font-mono font-bold text-gray-800 focus:ring-2 focus:ring-forest-800 focus:outline-none">
                     ${opcionesRecetas}
                 </select>
@@ -312,12 +312,61 @@
                 </div>
             </td>
         `;
+
+        // Fila inferior oculta hasta cambiar de receta
+        const trMeds = document.createElement('tr');
+        trMeds.id = 'fila-medicamentos-receta';
+        trMeds.className = 'hidden bg-emerald-50/20 border-l-4 border-l-emerald-600';
+        trMeds.innerHTML = `
+            <td colspan="5" class="px-4 py-2.5">
+                <div id="medicamentos-preview-container" class="flex flex-wrap items-center gap-2 text-[11px] text-gray-700"></div>
+            </td>
+        `;
+
+        tbody.prepend(trMeds);
         tbody.prepend(trNueva);
+    }
+
+    // Función para mostrar los medicamentos asociados a la receta seleccionada en tiempo real
+    function actualizarMedicamentosSeleccionados() {
+        const selectReceta = document.getElementById('select-receta-nueva');
+        const trMeds = document.getElementById('fila-medicamentos-receta');
+        const container = document.getElementById('medicamentos-preview-container');
+        if (!selectReceta || !trMeds || !container) return;
+
+        const recetaId = selectReceta.value;
+        if (!recetaId) {
+            trMeds.classList.add('hidden');
+            container.innerHTML = '';
+            return;
+        }
+
+        const recetaObj = recetasPaciente.find(r => String(r.id) === String(recetaId));
+        if (!recetaObj || !recetaObj.medicaciones || recetaObj.medicaciones.length === 0) {
+            container.innerHTML = `<span class="text-gray-400 italic">Esta receta no tiene fármacos registrados.</span>`;
+            trMeds.classList.remove('hidden');
+            return;
+        }
+
+        const chips = recetaObj.medicaciones.map(m => `
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-100/30 border border-cyan-500 text-gray-800 shadow-2xs">
+                <i class="fa-solid fa-pills text-cyan-600 text-[10px]"></i>
+                <strong>${m.farmaco}</strong>
+                <span class="font-mono text-gray-600">${m.dosis}</span>
+                <span class="text-gray-400">•</span>
+                <span class="text-gray-500">${m.via}</span>
+            </span>
+        `).join('');
+
+        container.innerHTML = `<span class="text-[10px] font-bold uppercase tracking-wider text-cyan-700 mr-1">Fármacos de la receta:</span>${chips}`;
+        trMeds.classList.remove('hidden');
     }
 
     function cancelarNuevaFila() {
         const fila = document.getElementById('fila-nueva-editable');
+        const filaMeds = document.getElementById('fila-medicamentos-receta');
         if (fila) fila.remove();
+        if (filaMeds) filaMeds.remove();
         filaNuevaAbierta = false;
         if (registrosGuardados.length === 0) renderTabla();
     }
